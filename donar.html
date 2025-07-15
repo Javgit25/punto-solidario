@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donar - Doná Tu Comida</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            padding: 30px 25px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .comercio-info {
+            background: #f8fafc;
+            padding: 25px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .comercio-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .comercio-address {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .canasta-info {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #16a34a;
+        }
+
+        .canasta-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #16a34a;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .canasta-content {
+            font-size: 14px;
+            color: #475569;
+            line-height: 1.5;
+        }
+
+        .donation-section {
+            padding: 30px 25px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .quick-amounts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .amount-btn {
+            background: #f1f5f9;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .amount-btn:hover {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .amount-btn.selected {
+            border-color: #2563eb;
+            background: #2563eb;
+            color: white;
+        }
+
+        .amount-value {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .amount-canastas {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .custom-amount {
+            margin-bottom: 25px;
+        }
+
+        .custom-amount label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .amount-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #d1d5db;
+            border-radius: 12px;
+            font-size: 18px;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .amount-input:focus {
+            border-color: #2563eb;
+        }
+
+        .equivalencia {
+            background: #f0f9ff;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 25px;
+            border: 1px solid #bfdbfe;
+        }
+
+        .equivalencia-text {
+            font-size: 14px;
+            color: #1e40af;
+            font-weight: bold;
+        }
+
+        .transparencia {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-size: 12px;
+            color: #6b7280;
+            text-align: center;
+        }
+
+        .donate-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .donate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(22, 163, 74, 0.3);
+        }
+
+        .donate-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #2563eb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success {
+            display: none;
+            text-align: center;
+            padding: 40px 25px;
+            background: #f0fdf4;
+        }
+
+        .success.show {
+            display: block;
+        }
+
+        .success-icon {
+            font-size: 60px;
+            color: #16a34a;
+            margin-bottom: 20px;
+        }
+
+        .success-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #15803d;
+            margin-bottom: 15px;
+        }
+
+        .success-message {
+            font-size: 16px;
+            color: #374151;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .track-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">🍞 Doná Tu Comida</div>
+            <div class="subtitle">Ayuda directa y transparente</div>
+        </div>
+
+        <!-- Información del comercio -->
+        <div class="comercio-info">
+            <div class="comercio-name" id="comercio-name">Panadería San Juan</div>
+            <div class="comercio-address" id="comercio-address">Av. San Juan 1234, Barracas</div>
+            
+            <div class="canasta-info">
+                <div class="canasta-title">
+                    🛒 Canasta Solidaria ($720)
+                </div>
+                <div class="canasta-content" id="canasta-content">
+                    Pan lactal + 6 facturas + 4 medialunas + 2 prepizzas
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario de donación -->
+        <div class="donation-section" id="donation-form">
+            <div class="section-title">Elegí el monto a donar</div>
+            
+            <!-- Montos rápidos -->
+            <div class="quick-amounts">
+                <div class="amount-btn" data-amount="800">
+                    <div class="amount-value">$800</div>
+                    <div class="amount-canastas">1 canasta</div>
+                </div>
+                <div class="amount-btn" data-amount="1600">
+                    <div class="amount-value">$1.600</div>
+                    <div class="amount-canastas">2 canastas</div>
+                </div>
+                <div class="amount-btn" data-amount="2400">
+                    <div class="amount-value">$2.400</div>
+                    <div class="amount-canastas">3 canastas</div>
+                </div>
+                <div class="amount-btn" data-amount="4000">
+                    <div class="amount-value">$4.000</div>
+                    <div class="amount-canastas">5 canastas</div>
+                </div>
+            </div>
+
+            <!-- Monto personalizado -->
+            <div class="custom-amount">
+                <label for="custom-input">Otro monto:</label>
+                <input type="number" id="custom-input" class="amount-input" placeholder="Ingresá el monto" min="100" step="50">
+            </div>
+
+            <!-- Equivalencia -->
+            <div class="equivalencia" id="equivalencia">
+                <div class="equivalencia-text">Seleccioná un monto para ver la equivalencia</div>
+            </div>
+
+            <!-- Transparencia -->
+            <div class="transparencia">
+                📊 <strong>Transparencia total:</strong> 90% va directo al comercio, 10% cubre operación de la plataforma. 
+                Podrás ver cuándo y a quién se entrega tu donación.
+            </div>
+
+            <!-- Botón donar -->
+            <button class="donate-btn" id="donate-btn" disabled onclick="procesarDonacion()">
+                Donar con MercadoPago
+            </button>
+        </div>
+
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div>Procesando tu donación...</div>
+        </div>
+
+        <!-- Success -->
+        <div class="success" id="success">
+            <div class="success-icon">✅</div>
+            <div class="success-title">¡Donación exitosa!</div>
+            <div class="success-message" id="success-message">
+                Tu donación de $800 ya está disponible para ayudar a quienes más lo necesitan.
+            </div>
+            <a href="#" class="track-btn" onclick="verSeguimiento()">Ver seguimiento</a>
+        </div>
+    </div>
+
+    <script>
+        let montoSeleccionado = 0;
+        
+        // Configuración del comercio (vendría de la URL o base de datos)
+        const comercioData = {
+            id: 'panaderia-san-juan-001',
+            nombre: 'Panadería San Juan',
+            direccion: 'Av. San Juan 1234, Barracas',
+            canasta: {
+                precio: 720,
+                contenido: 'Pan lactal + 6 facturas + 4 medialunas + 2 prepizzas'
+            },
+            costoCanasta: 800 // Precio con comisión incluida
+        };
+
+        // Manejo de botones de monto rápido
+        document.querySelectorAll('.amount-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Quitar selección anterior
+                document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
+                
+                // Seleccionar actual
+                this.classList.add('selected');
+                
+                // Limpiar input personalizado
+                document.getElementById('custom-input').value = '';
+                
+                // Actualizar monto
+                montoSeleccionado = parseInt(this.dataset.amount);
+                actualizarEquivalencia();
+                habilitarBoton();
+            });
+        });
+
+        // Manejo de monto personalizado
+        document.getElementById('custom-input').addEventListener('input', function() {
+            // Quitar selección de botones
+            document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
+            
+            // Actualizar monto
+            montoSeleccionado = parseInt(this.value) || 0;
+            actualizarEquivalencia();
+            habilitarBoton();
+        });
+
+        function actualizarEquivalencia() {
+            const equivalenciaEl = document.getElementById('equivalencia');
+            
+            if (montoSeleccionado >= comercioData.costoCanasta) {
+                const canastas = Math.floor(montoSeleccionado / comercioData.costoCanasta);
+                const restante = montoSeleccionado % comercioData.costoCanasta;
+                
+                let texto = `💝 Tu donación de $${montoSeleccionado.toLocaleString()} = ${canastas} canasta${canastas > 1 ? 's' : ''}`;
+                
+                if (restante > 0) {
+                    texto += ` + $${restante} adicionales`;
+                }
+                
+                equivalenciaEl.innerHTML = `<div class="equivalencia-text">${texto}</div>`;
+            } else if (montoSeleccionado > 0) {
+                const faltante = comercioData.costoCanasta - montoSeleccionado;
+                equivalenciaEl.innerHTML = `<div class="equivalencia-text">💛 Te faltan $${faltante} para completar 1 canasta</div>`;
+            } else {
+                equivalenciaEl.innerHTML = `<div class="equivalencia-text">Seleccioná un monto para ver la equivalencia</div>`;
+            }
+        }
+
+        function habilitarBoton() {
+            const btn = document.getElementById('donate-btn');
+            if (montoSeleccionado >= 100) {
+                btn.disabled = false;
+                btn.textContent = `Donar $${montoSeleccionado.toLocaleString()} con MercadoPago`;
+            } else {
+                btn.disabled = true;
+                btn.textContent = 'Donar con MercadoPago';
+            }
+        }
+
+        function procesarDonacion() {
+            if (montoSeleccionado < 100) {
+                alert('El monto mínimo de donación es $100');
+                return;
+            }
+
+            // Ocultar formulario y mostrar loading
+            document.getElementById('donation-form').style.display = 'none';
+            document.getElementById('loading').classList.add('show');
+
+            // Simular procesamiento con MercadoPago
+            setTimeout(() => {
+                // Simular éxito
+                const canastas = Math.floor(montoSeleccionado / comercioData.costoCanasta);
+                const mensaje = canastas > 0 
+                    ? `Tu donación de $${montoSeleccionado.toLocaleString()} generó ${canastas} canasta${canastas > 1 ? 's' : ''} solidaria${canastas > 1 ? 's' : ''} para ${comercioData.nombre}.`
+                    : `Tu donación de $${montoSeleccionado.toLocaleString()} se sumó al fondo solidario de ${comercioData.nombre}.`;
+
+                document.getElementById('success-message').textContent = mensaje;
+                
+                // Ocultar loading y mostrar éxito
+                document.getElementById('loading').classList.remove('show');
+                document.getElementById('success').classList.add('show');
+
+                // Aquí se enviaría la actualización a la base de datos
+                // y se actualizaría la tablet en tiempo real
+                simularActualizacionTablet();
+                
+            }, 3000); // 3 segundos de "procesamiento"
+        }
+
+        function simularActualizacionTablet() {
+            // Esta función simula la actualización en tiempo real de la tablet
+            // En la implementación real, esto sería a través de websockets o base de datos en tiempo real
+            console.log(`✅ Donación procesada: $${montoSeleccionado} al comercio ${comercioData.id}`);
+            
+            // Simular notificación push a la tablet
+            if (window.opener) {
+                // Si se abrió desde la tablet, actualizar la ventana padre
+                window.opener.postMessage({
+                    tipo: 'nueva_donacion',
+                    monto: montoSeleccionado,
+                    canastas: Math.floor(montoSeleccionado / comercioData.costoCanasta)
+                }, '*');
+            }
+        }
+
+        function verSeguimiento() {
+            // Generar ID único para esta donación
+            const donacionId = 'DTC-2025-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+            
+            // En la implementación real, esto abriría la página de seguimiento
+            // con el ID específico de la donación
+            const urlSeguimiento = `seguimiento.html?id=${donacionId}`;
+            
+            // Por ahora, crear una nueva ventana para mostrar el seguimiento
+            const ventanaSeguimiento = window.open('', 'seguimiento', 'width=450,height=800,scrollbars=yes');
+            
+            if (ventanaSeguimiento) {
+                alert('🔍 Abriendo tu página de seguimiento personalizada...\n\n' +
+                      `ID de donación: ${donacionId}\n\n` +
+                      'Podrás:\n' +
+                      '• Ver el estado en tiempo real\n' +
+                      '• Ver fotos de la entrega\n' +
+                      '• Compartir tu ayuda\n' +
+                      '• Descargar comprobante\n\n' +
+                      '¡Tu donación es 100% transparente!');
+                
+                // Guardar datos de la donación para el seguimiento
+                const datosParaSeguimiento = {
+                    id: donacionId,
+                    monto: montoSeleccionado,
+                    fecha: new Date().toLocaleString('es-AR'),
+                    comercio: comercioData,
+                    timestamp: Date.now()
+                };
+                
+                // En la implementación real, esto se guardaría en la base de datos
+                // y se vincularía con el email/teléfono del donante
+                console.log('💾 Datos de donación guardados:', datosParaSeguimiento);
+                
+                // Simular envío de enlace de seguimiento por WhatsApp/Email
+                setTimeout(() => {
+                    mostrarOpcionesSeguimiento(donacionId);
+                }, 2000);
+            }
+        }
+
+        function mostrarOpcionesSeguimiento(donacionId) {
+            const opciones = confirm(
+                '📧 ¿Querés recibir el enlace de seguimiento?\n\n' +
+                '• Por WhatsApp (recomendado)\n' +
+                '• Por Email\n' +
+                '• Guardar en favoritos\n\n' +
+                '¿Continuar?'
+            );
+
+            if (opciones) {
+                // Simular envío de enlace
+                alert(`📱 ¡Listo!\n\n` +
+                      `Te enviamos el enlace de seguimiento:\n` +
+                      `https://donatucomida.com/seguimiento/${donacionId}\n\n` +
+                      `También podés acceder desde tu historial de donaciones.`);
+            }
+        }
+
+        // Inicializar
+        document.getElementById('comercio-name').textContent = comercioData.nombre;
+        document.getElementById('comercio-address').textContent = comercioData.direccion;
+        document.getElementById('canasta-content').textContent = comercioData.canasta.contenido;
+    </script>
+</body>
+</html>

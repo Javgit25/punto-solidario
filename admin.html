@@ -1,0 +1,2415 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrador - Doná Tu Comida</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(135deg, #1e293b, #334155);
+            color: white;
+            padding: 20px 0;
+            z-index: 100;
+            box-shadow: 4px 0 12px rgba(0,0,0,0.1);
+        }
+
+        .logo-section {
+            padding: 20px 25px;
+            border-bottom: 1px solid #475569;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #f1f5f9;
+            margin-bottom: 5px;
+        }
+
+        .admin-label {
+            font-size: 12px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-menu {
+            padding: 0 15px;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 15px 20px;
+            color: #cbd5e1;
+            text-decoration: none;
+            border-radius: 10px;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .nav-item .icon {
+            margin-right: 12px;
+            font-size: 16px;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            min-height: 100vh;
+            background: #f8fafc;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1e293b;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .notification-bell {
+            position: relative;
+            background: #f1f5f9;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .notification-bell:hover {
+            background: #e2e8f0;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #dc2626;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+
+        .content-area {
+            padding: 30px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-title {
+            font-size: 14px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-icon {
+            font-size: 24px;
+            padding: 10px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-icon.blue { background: #eff6ff; color: #2563eb; }
+        .stat-icon.green { background: #f0fdf4; color: #16a34a; }
+        .stat-icon.orange { background: #fff7ed; color: #ea580c; }
+        .stat-icon.red { background: #fef2f2; color: #dc2626; }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            color: #16a34a;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e293b;
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            text-align: left;
+            padding: 12px;
+            background: #f8fafc;
+            color: #374151;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #4b5563;
+        }
+
+        .table tr:hover {
+            background: #f8fafc;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.pending { background: #fef3c7; color: #92400e; }
+        .status-badge.approved { background: #dcfce7; color: #166534; }
+        .status-badge.rejected { background: #fecaca; color: #991b1b; }
+        .status-badge.active { background: #dbeafe; color: #1e40af; }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #374151;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 25px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1e293b;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .modal-footer {
+            padding: 20px 25px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #2563eb;
+        }
+
+        .textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border-left-color: #f59e0b;
+            color: #92400e;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            border-left-color: #10b981;
+            color: #065f46;
+        }
+
+        .alert-danger {
+            background: #fecaca;
+            border-left-color: #ef4444;
+            color: #991b1b;
+        }
+
+        .comercio-detail {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .comercio-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .canasta-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .canasta-version {
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid;
+        }
+
+        .canasta-version.anterior {
+            border-color: #e2e8f0;
+            background: #f8fafc;
+        }
+
+        .canasta-version.nueva {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .version-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .canasta-content {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #374151;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #16a34a;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-weight: 500;
+            z-index: 1100;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #374151;
+        }
+
+        .empty-description {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .canasta-comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo-section">
+            <div class="logo">🍞 Doná Tu Comida</div>
+            <div class="admin-label">Panel Administrador</div>
+        </div>
+        
+        <div class="nav-menu">
+            <div class="nav-item active" onclick="cambiarSeccion('dashboard')">
+                <span class="icon">📊</span>
+                Dashboard
+            </div>
+            <div class="nav-item" onclick="cambiarSeccion('comercios')">
+                <span class="icon">🏪</span>
+                Comercios
+            </div>
+            <div class="nav-item" onclick="cambiarSeccion('validaciones')" style="position: relative;">
+                <span class="icon">✅</span>
+                Validaciones
+                <span id="validaciones-badge" class="notification-badge" style="position: absolute; right: 20px;">3</span>
+            </div>
+            <div class="nav-item" onclick="cambiarSeccion('monitoreo')">
+                <span class="icon">🔍</span>
+                Monitoreo
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <div class="page-title" id="page-title">Dashboard General</div>
+                <div class="user-info">
+                    <div class="notification-bell" onclick="mostrarNotificaciones()">
+                        <span>🔔</span>
+                        <div class="notification-badge">3</div>
+                    </div>
+                    <div>
+                        <div style="font-weight: 600;">Admin</div>
+                        <div style="font-size: 12px; color: #6b7280;">Administrador</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Dashboard Section -->
+            <div class="section active" id="dashboard-section">
+                <!-- Statistics Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Total Donaciones</div>
+                            <div class="stat-icon blue">💰</div>
+                        </div>
+                        <div class="stat-number">$24.750</div>
+                        <div class="stat-change">+12% vs mes anterior</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Comercios Activos</div>
+                            <div class="stat-icon green">🏪</div>
+                        </div>
+                        <div class="stat-number">47</div>
+                        <div class="stat-change">+3 nuevos esta semana</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Entregas Realizadas</div>
+                            <div class="stat-icon orange">📦</div>
+                        </div>
+                        <div class="stat-number">189</div>
+                        <div class="stat-change">+8% vs semana anterior</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Validaciones Pendientes</div>
+                            <div class="stat-icon red">⏳</div>
+                        </div>
+                        <div class="stat-number">3</div>
+                        <div class="stat-change">Requieren atención</div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Actividad Reciente</div>
+                        <button class="btn btn-secondary">Ver Todo</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Tipo</th>
+                                        <th>Comercio</th>
+                                        <th>Descripción</th>
+                                        <th>Fecha</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>📝 Canasta</td>
+                                        <td>Panadería San Juan</td>
+                                        <td>Solicitud cambio de canasta</td>
+                                        <td>Hace 30 min</td>
+                                        <td><span class="status-badge pending">Pendiente</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>🏪 Comercio</td>
+                                        <td>Verdulería El Buen Sabor</td>
+                                        <td>Nuevo comercio registrado</td>
+                                        <td>Hace 1 hora</td>
+                                        <td><span class="status-badge pending">Pendiente</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>💰 Donación</td>
+                                        <td>Almacén Don Pedro</td>
+                                        <td>Donación de $1.600 recibida</td>
+                                        <td>Hace 2 horas</td>
+                                        <td><span class="status-badge approved">Procesada</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>📦 Entrega</td>
+                                        <td>Panadería San Juan</td>
+                                        <td>Entrega validada automáticamente</td>
+                                        <td>Hace 3 horas</td>
+                                        <td><span class="status-badge approved">Validada</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comercios Section -->
+            <div class="section" id="comercios-section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Gestión de Comercios</div>
+                        <button class="btn btn-primary" onclick="agregarComercio()">Agregar Comercio</button>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Comercio</th>
+                                    <th>Dirección</th>
+                                    <th>Tipo</th>
+                                    <th>Donaciones</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 600;">Panadería San Juan</div>
+                                        <div style="font-size: 12px; color: #6b7280;">ID: PSJ-001</div>
+                                    </td>
+                                    <td>Av. San Juan 1234, Barracas</td>
+                                    <td>Panadería</td>
+                                    <td>$8.640</td>
+                                    <td><span class="status-badge active">Activo</span></td>
+                                    <td>
+                                        <button class="btn btn-secondary" onclick="verComercio('PSJ-001')">Ver</button>
+                                        <button class="btn btn-primary" onclick="editarComercio('PSJ-001')">Editar</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 600;">Verdulería El Buen Sabor</div>
+                                        <div style="font-size: 12px; color: #6b7280;">ID: VBS-002</div>
+                                    </td>
+                                    <td>Defensa 567, San Telmo</td>
+                                    <td>Verdulería</td>
+                                    <td>$0</td>
+                                    <td><span class="status-badge pending">Pendiente</span></td>
+                                    <td>
+                                        <button class="btn btn-success" onclick="validarComercio('VBS-002')">Validar</button>
+                                        <button class="btn btn-danger" onclick="rechazarComercioDirecto('VBS-002')">Rechazar</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 600;">Almacén Don Pedro</div>
+                                        <div style="font-size: 12px; color: #6b7280;">ID: ADP-003</div>
+                                    </td>
+                                    <td>Corrientes 890, Almagro</td>
+                                    <td>Almacén</td>
+                                    <td>$5.760</td>
+                                    <td><span class="status-badge active">Activo</span></td>
+                                    <td>
+                                        <button class="btn btn-secondary" onclick="verComercio('ADP-003')">Ver</button>
+                                        <button class="btn btn-primary" onclick="editarComercio('ADP-003')">Editar</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Validaciones Section -->
+            <div class="section" id="validaciones-section">
+                <div class="alert alert-warning">
+                    <strong>⚠️ Atención:</strong> Tienes 3 solicitudes pendientes de validación que requieren tu revisión.
+                </div>
+
+                <!-- Solicitudes de Canastas -->
+                <div class="card" style="margin-bottom: 30px;">
+                    <div class="card-header">
+                        <div class="card-title">Solicitudes de Cambio de Canasta</div>
+                        <span class="status-badge pending">2 Pendientes</span>
+                    </div>
+                    <div class="card-body">
+                        <!-- Solicitud 1 -->
+                        <div style="border: 2px solid #fbbf24; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 15px;">
+                                <div>
+                                    <h4 style="color: #1e293b; margin-bottom: 5px;">Panadería San Juan</h4>
+                                    <div style="font-size: 12px; color: #6b7280;">Solicitud enviada hace 30 minutos</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 12px; color: #6b7280;">ID: PSJ-001</div>
+                                    <div style="font-size: 12px; color: #6b7280;">Solicitud #CS-001</div>
+                                </div>
+                            </div>
+
+                            <div class="comercio-detail">
+                                <div class="comercio-info">
+                                    <div class="info-item">
+                                        <div class="info-label">Comercio</div>
+                                        <div class="info-value">Panadería San Juan</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">Dirección</div>
+                                        <div class="info-value">Av. San Juan 1234, Barracas</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">Precio Canasta</div>
+                                        <div class="info-value">$720</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">Donaciones Total</div>
+                                        <div class="info-value">$8.640</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="canasta-comparison">
+                                <div class="canasta-version anterior">
+                                    <div class="version-title" style="color: #6b7280;">Canasta Actual</div>
+                                    <div class="canasta-content">
+                                        Pan lactal + 6 facturas + 4 medialunas + 2 prepizzas
+                                    </div>
+                                </div>
+                                <div class="canasta-version nueva">
+                                    <div class="version-title" style="color: #2563eb;">Canasta Propuesta</div>
+                                    <div class="canasta-content">
+                                        Pan lactal + 8 facturas + 6 medialunas + 3 prepizzas + 1 torta pequeña
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                                <div style="margin-bottom: 15px;">
+                                    <strong>Justificación del comercio:</strong>
+                                    <div style="margin-top: 5px; color: #4b5563; font-style: italic;">
+                                        "Hemos mejorado nuestra capacidad de producción y queremos ofrecer más variedad y cantidad a las personas que necesitan ayuda."
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 10px;">
+                                    <button class="btn btn-success" onclick="aprobarCanasta('CS-001')">
+                                        ✅ Aprobar Cambio
+                                    </button>
+                                    <button class="btn btn-danger" onclick="rechazarCanasta('CS-001')">
+                                        ❌ Rechazar
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="solicitarMasInfo('CS-001')">
+                                        📝 Solicitar Más Info
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Solicitud 2 -->
+                        <div style="border: 2px solid #fbbf24; border-radius: 12px; padding: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <div>
+                                    <h4 style="color: #1e293b; margin-bottom: 5px;">Almacén Don Pedro</h4>
+                                    <div style="font-size: 12px; color: #6b7280;">Solicitud enviada hace 2 horas</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 12px; color: #6b7280;">ID: ADP-003</div>
+                                    <div style="font-size: 12px; color: #6b7280;">Solicitud #CS-002</div>
+                                </div>
+                            </div>
+
+                            <div class="comercio-detail">
+                                <div class="comercio-info">
+                                    <div class="info-item">
+                                        <div class="info-label">Comercio</div>
+                                        <div class="info-value">Almacén Don Pedro</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">Dirección</div>
+                                        <div class="info-value">Corrientes 890, Almagro</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">Precio Canasta</div>
+                                        <div class="info-value">$720</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">Donaciones Total</div>
+                                        <div class="info-value">$5.760</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="canasta-comparison">
+                                <div class="canasta-version anterior">
+                                    <div class="version-title" style="color: #6b7280;">Canasta Actual</div>
+                                    <div class="canasta-content">
+                                        Leche larga vida + Fideos + Arroz + Aceite + Conservas
+                                    </div>
+                                </div>
+                                <div class="canasta-version nueva">
+                                    <div class="version-title" style="color: #2563eb;">Canasta Propuesta</div>
+                                    <div class="canasta-content">
+                                        Leche larga vida (2L) + Fideos (2 paq) + Arroz (1kg) + Aceite + Conservas + Yerba mate
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                                <div style="margin-bottom: 15px;">
+                                    <strong>Justificación del comercio:</strong>
+                                    <div style="margin-top: 5px; color: #4b5563; font-style: italic;">
+                                        "Agregamos yerba mate porque muchas personas vulnerables nos la piden específicamente, es un producto muy valorado."
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 10px;">
+                                    <button class="btn btn-success" onclick="aprobarCanasta('CS-002')">
+                                        ✅ Aprobar Cambio
+                                    </button>
+                                    <button class="btn btn-danger" onclick="rechazarCanasta('CS-002')">
+                                        ❌ Rechazar
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="solicitarMasInfo('CS-002')">
+                                        📝 Solicitar Más Info
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Validación de Comercios Nuevos -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Validación de Comercios Nuevos</div>
+                        <span class="status-badge pending">1 Pendiente</span>
+                    </div>
+                    <div class="card-body">
+                        <div style="border: 2px solid #3b82f6; border-radius: 12px; padding: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <div>
+                                    <h4 style="color: #1e293b; margin-bottom: 5px;">Verdulería El Buen Sabor</h4>
+                                    <div style="font-size: 12px; color: #6b7280;">Registrado hace 1 hora</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 12px; color: #6b7280;">ID: VBS-002</div>
+                                    <div style="font-size: 12px; color: #6b7280;">Solicitud #VC-001</div>
+                                </div>
+                            </div>
+
+                            <div class="comercio-detail">
+                                <div class="comercio-info">
+                                    <div class="info-item">
+                                        <div class="info-label">Nombre</div>
+                                        <div class="info-value">Verdulería El Buen Sabor</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">Propietario</div>
+                                        <div class="info-value">Roberto Fernández</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">Dirección</div>
+                                        <div class="info-value">Defensa 567, San Telmo</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">Teléfono</div>
+                                        <div class="info-value">11 4321-5678</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">Email</div>
+                                        <div class="info-value">roberto@buensabor.com</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">Tipo de Comercio</div>
+                                        <div class="info-value">Verdulería</div>
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-top: 15px;">
+                                    <div class="info-label">Canasta Propuesta ($720)</div>
+                                    <div class="info-value">Frutas de estación (2kg) + Verduras variadas (3kg) + Hortalizas frescas (1kg)</div>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                                <div style="display: flex; gap: 10px;">
+                                    <button class="btn btn-success" onclick="aprobarComercio('VBS-002')">
+                                        ✅ Aprobar Comercio
+                                    </button>
+                                    <button class="btn btn-danger" onclick="rechazarComercio('VBS-002')">
+                                        ❌ Rechazar
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="solicitarDocumentacion('VBS-002')">
+                                        📎 Solicitar Documentación
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monitoreo Section -->
+            <div class="section" id="monitoreo-section">
+                <div class="card" style="margin-bottom: 30px;">
+                    <div class="card-header">
+                        <div class="card-title">Entregas Sospechosas</div>
+                        <span class="status-badge pending">Revisión Requerida</span>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Beneficiario</th>
+                                    <th>Comercio</th>
+                                    <th>Frecuencia</th>
+                                    <th>Última Entrega</th>
+                                    <th>Método ID</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="background: #fef3c7;">
+                                    <td>
+                                        <div style="font-weight: 600;">Carlos Mendez</div>
+                                        <div style="font-size: 12px; color: #92400e;">⚠️ 3 retiros en 2 días</div>
+                                    </td>
+                                    <td>Panadería San Juan</td>
+                                    <td>3 veces</td>
+                                    <td>Hace 30 min</td>
+                                    <td>Solo nombre</td>
+                                    <td>
+                                        <button class="btn btn-secondary" onclick="revisarBeneficiario('carlos-mendez')">
+                                            🔍 Revisar
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr style="background: #fecaca;">
+                                    <td>
+                                        <div style="font-weight: 600;">Ana Silva</div>
+                                        <div style="font-size: 12px; color: #991b1b;">🚨 5 retiros en 3 comercios</div>
+                                    </td>
+                                    <td>Múltiples</td>
+                                    <td>5 veces</td>
+                                    <td>Hace 1 hora</td>
+                                    <td>DNI: 12345678</td>
+                                    <td>
+                                        <button class="btn btn-danger" onclick="bloquearBeneficiario('ana-silva')">
+                                            🚫 Bloquear
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Estadísticas de Fraude</div>
+                        <button class="btn btn-secondary">Exportar Reporte</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-header">
+                                    <div class="stat-title">Entregas Válidas</div>
+                                    <div class="stat-icon green">✅</div>
+                                </div>
+                                <div class="stat-number">186</div>
+                                <div class="stat-change">98.4% del total</div>
+                            </div>
+
+                            <div class="stat-card">
+                                <div class="stat-header">
+                                    <div class="stat-title">Entregas Sospechosas</div>
+                                    <div class="stat-icon orange">⚠️</div>
+                                </div>
+                                <div class="stat-number">3</div>
+                                <div class="stat-change">1.6% del total</div>
+                            </div>
+
+                            <div class="stat-card">
+                                <div class="stat-header">
+                                    <div class="stat-title">Usuarios Bloqueados</div>
+                                    <div class="stat-icon red">🚫</div>
+                                </div>
+                                <div class="stat-number">0</div>
+                                <div class="stat-change">Excelente comportamiento</div>
+                            </div>
+
+                            <div class="stat-card">
+                                <div class="stat-header">
+                                    <div class="stat-title">Tasa de Confianza</div>
+                                    <div class="stat-icon blue">🛡️</div>
+                                </div>
+                                <div class="stat-number">98.4%</div>
+                                <div class="stat-change">Sistema confiable</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para acciones -->
+    <div class="modal" id="action-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modal-title">Confirmar Acción</div>
+            </div>
+            <div class="modal-body">
+                <div id="modal-body-content">
+                    <!-- Contenido dinámico -->
+                </div>
+                <div class="form-group" id="comentario-group" style="display: none;">
+                    <label class="form-label">Comentarios (opcional)</label>
+                    <textarea class="form-control textarea" id="comentario-admin" placeholder="Añade comentarios sobre tu decisión..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+                <button class="btn btn-primary" id="confirmar-accion" onclick="ejecutarAccion()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let accionActual = null;
+        let solicitudesPendientes = 3;
+        
+        // Arrays para almacenar datos dinámicos
+        let comercios = [
+            {
+                id: 'PSJ-001',
+                nombre: 'Panadería San Juan',
+                propietario: 'Juan Pérez',
+                direccion: 'Av. San Juan 1234, Barracas',
+                telefono: '11 4567-8901',
+                email: 'juan@panaderiasanjuan.com',
+                tipo: 'Panadería',
+                donaciones: '$8.640',
+                estado: 'activo'
+            },
+            {
+                id: 'VBS-002',
+                nombre: 'Verdulería El Buen Sabor',
+                propietario: 'Roberto Fernández',
+                direccion: 'Defensa 567, San Telmo',
+                telefono: '11 4321-5678',
+                email: 'roberto@buensabor.com',
+                tipo: 'Verdulería',
+                donaciones: '$0',
+                estado: 'pendiente'
+            },
+            {
+                id: 'ADP-003',
+                nombre: 'Almacén Don Pedro',
+                propietario: 'Pedro González',
+                direccion: 'Corrientes 890, Almagro',
+                telefono: '11 2345-6789',
+                email: 'pedro@donpedro.com',
+                tipo: 'Almacén',
+                donaciones: '$5.760',
+                estado: 'activo'
+            }
+        ];
+
+        let solicitudesCanasta = [
+            {
+                id: 'CS-001',
+                comercioId: 'PSJ-001',
+                comercioNombre: 'Panadería San Juan',
+                canasteraAnterior: 'Pan lactal + 6 facturas + 4 medialunas + 2 prepizzas',
+                canastaNueva: 'Pan lactal + 8 facturas + 6 medialunas + 3 prepizzas + 1 torta pequeña',
+                justificacion: 'Hemos mejorado nuestra capacidad de producción y queremos ofrecer más variedad y cantidad a las personas que necesitan ayuda.',
+                estado: 'pendiente'
+            },
+            {
+                id: 'CS-002',
+                comercioId: 'ADP-003',
+                comercioNombre: 'Almacén Don Pedro',
+                canastaAnterior: 'Leche larga vida + Fideos + Arroz + Aceite + Conservas',
+                canastaNueva: 'Leche larga vida (2L) + Fideos (2 paq) + Arroz (1kg) + Aceite + Conservas + Yerba mate',
+                justificacion: 'Agregamos yerba mate porque muchas personas vulnerables nos la piden específicamente, es un producto muy valorado.',
+                estado: 'pendiente'
+            }
+        ];
+
+        // Cambiar secciones
+        function cambiarSeccion(seccion) {
+            // Quitar active de todos los nav-items y secciones
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+
+            // Activar nav-item clickeado
+            event.target.closest('.nav-item').classList.add('active');
+            
+            // Activar sección correspondiente
+            document.getElementById(`${seccion}-section`).classList.add('active');
+
+            // Actualizar título de página
+            const titulos = {
+                'dashboard': 'Dashboard General',
+                'comercios': 'Gestión de Comercios',
+                'validaciones': 'Validaciones Pendientes',
+                'monitoreo': 'Monitoreo y Fraude'
+            };
+            document.getElementById('page-title').textContent = titulos[seccion];
+        }
+
+        // Mostrar notificaciones
+        function mostrarNotificaciones() {
+            const notificaciones = [
+                '📝 Nueva solicitud de canasta - Panadería San Juan',
+                '🏪 Comercio nuevo registrado - Verdulería El Buen Sabor',
+                '⚠️ Entrega sospechosa detectada - Carlos Mendez'
+            ];
+            
+            let mensaje = 'Notificaciones pendientes:\n\n';
+            notificaciones.forEach((notif, index) => {
+                mensaje += `${index + 1}. ${notif}\n`;
+            });
+            
+            alert(mensaje);
+        }
+
+        // Aprobar canasta
+        function aprobarCanasta(solicitudId) {
+            accionActual = {
+                tipo: 'aprobar_canasta',
+                id: solicitudId,
+                titulo: '✅ Aprobar Cambio de Canasta',
+                contenido: '¿Estás seguro de que quieres aprobar este cambio de canasta? Esta acción notificará al comercio y actualizará inmediatamente su configuración.',
+                btnTexto: 'Aprobar Cambio',
+                btnClase: 'btn-success'
+            };
+            mostrarModal();
+        }
+
+        // Rechazar canasta
+        function rechazarCanasta(solicitudId) {
+            accionActual = {
+                tipo: 'rechazar_canasta',
+                id: solicitudId,
+                titulo: '❌ Rechazar Cambio de Canasta',
+                contenido: '¿Estás seguro de que quieres rechazar este cambio de canasta? El comercio será notificado de tu decisión.',
+                btnTexto: 'Rechazar',
+                btnClase: 'btn-danger',
+                requiereComentario: true
+            };
+            mostrarModal();
+        }
+
+        // Solicitar más información
+        function solicitarMasInfo(solicitudId) {
+            accionActual = {
+                tipo: 'solicitar_info',
+                id: solicitudId,
+                titulo: '📝 Solicitar Más Información',
+                contenido: 'Se enviará un mensaje al comercio solicitando información adicional sobre su propuesta de canasta.',
+                btnTexto: 'Enviar Solicitud',
+                btnClase: 'btn-primary',
+                requiereComentario: true
+            };
+            mostrarModal();
+        }
+
+        // Aprobar comercio
+        function aprobarComercio(comercioId) {
+            console.log('🔍 Intentando aprobar comercio:', comercioId);
+            
+            // Verificar que el comercio existe
+            const comercio = comercios.find(c => c.id === comercioId);
+            if (!comercio) {
+                console.error('❌ Comercio no encontrado:', comercioId);
+                mostrarNotificacion('❌ Error: Comercio no encontrado');
+                return;
+            }
+            
+            accionActual = {
+                tipo: 'aprobar_comercio',
+                id: comercioId,
+                titulo: '✅ Aprobar Comercio',
+                contenido: `¿Estás seguro de que quieres aprobar "${comercio.nombre}"? Se activará inmediatamente y podrá comenzar a recibir donaciones.`,
+                btnTexto: 'Aprobar Comercio',
+                btnClase: 'btn-success'
+            };
+            
+            console.log('📝 Acción creada:', accionActual);
+            mostrarModal();
+        }
+
+        // Rechazar comercio
+        function rechazarComercio(comercioId) {
+            console.log('🔍 Intentando rechazar comercio:', comercioId);
+            
+            accionActual = {
+                tipo: 'rechazar_comercio',
+                id: comercioId,
+                titulo: '❌ Rechazar Comercio',
+                contenido: '¿Estás seguro de que quieres rechazar este comercio? No podrá participar en la plataforma.',
+                btnTexto: 'Rechazar',
+                btnClase: 'btn-danger',
+                requiereComentario: true
+            };
+            
+            console.log('📝 Acción creada:', accionActual);
+            mostrarModal();
+        }
+
+        // Mostrar modal
+        function mostrarModal() {
+            document.getElementById('modal-title').textContent = accionActual.titulo;
+            document.getElementById('modal-body-content').innerHTML = `<p>${accionActual.contenido}</p>`;
+            
+            const comentarioGroup = document.getElementById('comentario-group');
+            if (accionActual.requiereComentario) {
+                comentarioGroup.style.display = 'block';
+            } else {
+                comentarioGroup.style.display = 'none';
+            }
+
+            const btnConfirmar = document.getElementById('confirmar-accion');
+            btnConfirmar.textContent = accionActual.btnTexto;
+            btnConfirmar.className = `btn ${accionActual.btnClase}`;
+
+            document.getElementById('action-modal').classList.add('show');
+        }
+
+        // Cerrar modal
+        function cerrarModal() {
+            document.getElementById('action-modal').classList.remove('show');
+            document.getElementById('comentario-admin').value = '';
+            accionActual = null;
+        }
+
+        // Ejecutar acción
+        function ejecutarAccion() {
+            if (!accionActual) return;
+
+            const comentario = document.getElementById('comentario-admin').value;
+
+            // Simular procesamiento
+            switch (accionActual.tipo) {
+                case 'aprobar_canasta':
+                    procesarAprobacionCanasta(accionActual.id, comentario);
+                    break;
+                case 'rechazar_canasta':
+                    procesarRechazoCanasta(accionActual.id, comentario);
+                    break;
+                case 'aprobar_comercio':
+                    procesarAprobacionComercio(accionActual.id, comentario);
+                    break;
+                case 'rechazar_comercio':
+                    procesarRechazoComercio(accionActual.id, comentario);
+                    break;
+                case 'solicitar_info':
+                    procesarSolicitudInfo(accionActual.id, comentario);
+                    break;
+            }
+
+            cerrarModal();
+        }
+
+        // Procesar aprobación de canasta
+        function procesarAprobacionCanasta(solicitudId, comentario) {
+            // Actualizar solicitud en array
+            const solicitud = solicitudesCanasta.find(s => s.id === solicitudId);
+            if (solicitud) {
+                solicitud.estado = 'aprobada';
+                actualizarSeccionValidaciones();
+            }
+
+            mostrarNotificacion('✅ Canasta aprobada exitosamente');
+            actualizarSolicitudesPendientes(-1);
+            
+            console.log(`✅ Canasta ${solicitudId} aprobada`, {
+                administrador: 'admin',
+                fecha: new Date(),
+                comentario: comentario,
+                accion: 'aprobar_canasta'
+            });
+
+            setTimeout(() => {
+                mostrarNotificacion('📧 Comercio notificado de la aprobación');
+            }, 2000);
+        }
+
+        // Procesar rechazo de canasta
+        function procesarRechazoCanasta(solicitudId, comentario) {
+            // Actualizar solicitud en array
+            const solicitud = solicitudesCanasta.find(s => s.id === solicitudId);
+            if (solicitud) {
+                solicitud.estado = 'rechazada';
+                actualizarSeccionValidaciones();
+            }
+
+            mostrarNotificacion('❌ Canasta rechazada');
+            actualizarSolicitudesPendientes(-1);
+            
+            console.log(`❌ Canasta ${solicitudId} rechazada`, {
+                administrador: 'admin',
+                fecha: new Date(),
+                comentario: comentario,
+                accion: 'rechazar_canasta'
+            });
+        }
+
+        // Procesar aprobación de comercio
+        function procesarAprobacionComercio(comercioId, comentario) {
+            // Actualizar comercio en array
+            const comercio = comercios.find(c => c.id === comercioId);
+            if (comercio) {
+                comercio.estado = 'activo';
+                actualizarTablaComercio();
+                actualizarSeccionValidaciones();
+            }
+
+            mostrarNotificacion('✅ Comercio aprobado y activado');
+            actualizarSolicitudesPendientes(-1);
+            
+            console.log(`✅ Comercio ${comercioId} aprobado`, {
+                administrador: 'admin',
+                fecha: new Date(),
+                comentario: comentario,
+                accion: 'aprobar_comercio'
+            });
+
+            setTimeout(() => {
+                mostrarNotificacion('🔑 Credenciales de acceso enviadas al comercio');
+            }, 3000);
+        }
+
+        // Regenerar completamente la sección validaciones
+        function regenerarSeccionValidaciones() {
+            try {
+                console.log('🔄 Regenerando sección validaciones...');
+                
+                const seccion = document.getElementById('validaciones-section');
+                if (!seccion) {
+                    throw new Error('Sección validaciones no encontrada');
+                }
+                
+                // Filtrar solicitudes pendientes
+                const solicitudesCanastaPendientes = solicitudesCanasta.filter(s => s.estado === 'pendiente');
+                const comerciosPendientes = comercios.filter(c => c.estado === 'pendiente');
+                
+                console.log('📊 Solicitudes canasta pendientes:', solicitudesCanastaPendientes.length);
+                console.log('📊 Comercios pendientes:', comerciosPendientes.length);
+                
+                // Calcular total pendientes
+                const totalPendientes = solicitudesCanastaPendientes.length + comerciosPendientes.length;
+                solicitudesPendientes = totalPendientes;
+                
+                console.log('📊 Total pendientes:', totalPendientes);
+                
+                // Actualizar badges
+                actualizarSolicitudesPendientes(0); // ✅ ESTA FUNCIÓN SÍ EXISTE
+                
+                // Actualizar alerta principal
+                let alertaHTML = '';
+                if (totalPendientes > 0) {
+                    alertaHTML = `
+                        <div class="alert alert-warning">
+                            <strong>⚠️ Atención:</strong> Tienes ${totalPendientes} solicitud${totalPendientes > 1 ? 'es' : ''} pendiente${totalPendientes > 1 ? 's' : ''} de validación que requiere${totalPendientes > 1 ? 'n' : ''} tu revisión.
+                        </div>
+                    `;
+                } else {
+                    alertaHTML = `
+                        <div class="alert alert-success">
+                            <strong>✅ Excelente:</strong> No tienes solicitudes pendientes de validación.
+                        </div>
+                    `;
+                }
+                
+                // Generar HTML para canastas (mantengo el código igual)
+                let canastasHTML = '';
+                if (solicitudesCanastaPendientes.length > 0) {
+                    canastasHTML = `
+                        <div class="card" style="margin-bottom: 30px;">
+                            <div class="card-header">
+                                <div class="card-title">Solicitudes de Cambio de Canasta</div>
+                                <span class="status-badge pending">${solicitudesCanastaPendientes.length} Pendiente${solicitudesCanastaPendientes.length > 1 ? 's' : ''}</span>
+                            </div>
+                            <div class="card-body">
+                                ${solicitudesCanastaPendientes.map(solicitud => `
+                                    <div style="border: 2px solid #fbbf24; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                            <div>
+                                                <h4 style="color: #1e293b; margin-bottom: 5px;">${solicitud.comercioNombre}</h4>
+                                                <div style="font-size: 12px; color: #6b7280;">Solicitud enviada hace 30 minutos</div>
+                                            </div>
+                                            <div style="text-align: right;">
+                                                <div style="font-size: 12px; color: #6b7280;">ID: ${solicitud.comercioId}</div>
+                                                <div style="font-size: 12px; color: #6b7280;">Solicitud #${solicitud.id}</div>
+                                            </div>
+                                        </div>
+                                        <div class="canasta-comparison">
+                                            <div class="canasta-version anterior">
+                                                <div class="version-title" style="color: #6b7280;">Canasta Actual</div>
+                                                <div class="canasta-content">${solicitud.canastaAnterior}</div>
+                                            </div>
+                                            <div class="canasta-version nueva">
+                                                <div class="version-title" style="color: #2563eb;">Canasta Propuesta</div>
+                                                <div class="canasta-content">${solicitud.canastaNueva}</div>
+                                            </div>
+                                        </div>
+                                        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                                            <div style="margin-bottom: 15px;">
+                                                <strong>Justificación del comercio:</strong>
+                                                <div style="margin-top: 5px; color: #4b5563; font-style: italic;">"${solicitud.justificacion}"</div>
+                                            </div>
+                                            <div style="display: flex; gap: 10px;">
+                                                <button class="btn btn-success" onclick="aprobarCanasta('${solicitud.id}')">✅ Aprobar Cambio</button>
+                                                <button class="btn btn-danger" onclick="rechazarCanasta('${solicitud.id}')">❌ Rechazar</button>
+                                                <button class="btn btn-secondary" onclick="solicitarMasInfo('${solicitud.id}')">📝 Solicitar Más Info</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    canastasHTML = `
+                        <div class="card" style="margin-bottom: 30px;">
+                            <div class="card-header">
+                                <div class="card-title">Solicitudes de Cambio de Canasta</div>
+                                <span class="status-badge approved">Todas Procesadas</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="empty-state">
+                                    <div class="empty-icon">✅</div>
+                                    <div class="empty-title">No hay solicitudes pendientes</div>
+                                    <div class="empty-description">Todas las solicitudes de canasta han sido procesadas.</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Generar HTML para comercios nuevos
+                let comerciosHTML = '';
+                if (comerciosPendientes.length > 0) {
+                    comerciosHTML = `
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">Validación de Comercios Nuevos</div>
+                                <span class="status-badge pending">${comerciosPendientes.length} Pendiente${comerciosPendientes.length > 1 ? 's' : ''}</span>
+                            </div>
+                            <div class="card-body">
+                                ${comerciosPendientes.map(comercio => `
+                                    <div style="border: 2px solid #3b82f6; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                            <div>
+                                                <h4 style="color: #1e293b; margin-bottom: 5px;">${comercio.nombre}</h4>
+                                                <div style="font-size: 12px; color: #6b7280;">Registrado ${comercio.fechaRegistro || 'hace 1 hora'}</div>
+                                            </div>
+                                            <div style="text-align: right;">
+                                                <div style="font-size: 12px; color: #6b7280;">ID: ${comercio.id}</div>
+                                                <div style="font-size: 12px; color: #6b7280;">Solicitud #VC-${comercio.id.split('-')[1]}</div>
+                                            </div>
+                                        </div>
+                                        <div class="comercio-detail">
+                                            <div class="comercio-info">
+                                                <div class="info-item">
+                                                    <div class="info-label">Nombre</div>
+                                                    <div class="info-value">${comercio.nombre}</div>
+                                                </div>
+                                                <div class="info-item">
+                                                    <div class="info-label">Propietario</div>
+                                                    <div class="info-value">${comercio.propietario}</div>
+                                                </div>
+                                                <div class="info-item">
+                                                    <div class="info-label">Dirección</div>
+                                                    <div class="info-value">${comercio.direccion}</div>
+                                                </div>
+                                                <div class="info-item">
+                                                    <div class="info-label">Teléfono</div>
+                                                    <div class="info-value">${comercio.telefono}</div>
+                                                </div>
+                                                <div class="info-item">
+                                                    <div class="info-label">Email</div>
+                                                    <div class="info-value">${comercio.email}</div>
+                                                </div>
+                                                <div class="info-item">
+                                                    <div class="info-label">Tipo de Comercio</div>
+                                                    <div class="info-value">${comercio.tipo}</div>
+                                                </div>
+                                            </div>
+                                            <div style="margin-top: 15px;">
+                                                <div class="info-label">Canasta Propuesta ($720)</div>
+                                                <div class="info-value">${comercio.canasta || 'Productos básicos del rubro'}</div>
+                                            </div>
+                                        </div>
+                                        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                                            <div style="display: flex; gap: 10px;">
+                                                <button class="btn btn-success" onclick="aprobarComercio('${comercio.id}')">✅ Aprobar Comercio</button>
+                                                <button class="btn btn-danger" onclick="rechazarComercio('${comercio.id}')">❌ Rechazar</button>
+                                                <button class="btn btn-secondary" onclick="solicitarDocumentacion('${comercio.id}')">📎 Solicitar Documentación</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    comerciosHTML = `
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">Validación de Comercios Nuevos</div>
+                                <span class="status-badge approved">Todos Validados</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="empty-state">
+                                    <div class="empty-icon">🏪</div>
+                                    <div class="empty-title">No hay comercios pendientes</div>
+                                    <div class="empty-description">Todos los comercios han sido validados.</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Actualizar todo el contenido de la sección
+                seccion.innerHTML = alertaHTML + canastasHTML + comerciosHTML;
+                
+                console.log('✅ Sección validaciones regenerada exitosamente');
+                
+            } catch (error) {
+                console.error('❌ Error al regenerar sección validaciones:', error);
+                mostrarNotificacion('❌ Error al actualizar validaciones: ' + error.message);
+            }
+        }
+
+        // Procesar rechazo de comercio
+        function procesarRechazoComercio(comercioId, comentario) {
+            mostrarNotificacion('❌ Comercio rechazado');
+            actualizarSolicitudesPendientes(-1);
+            
+            console.log(`❌ Comercio ${comercioId} rechazado`, {
+                administrador: 'admin',
+                fecha: new Date(),
+                comentario: comentario,
+                accion: 'rechazar_comercio'
+            });
+        }
+
+        // Mostrar modal personalizado para formularios
+        function mostrarModalPersonalizado() {
+            document.getElementById('modal-title').textContent = accionActual.titulo;
+            document.getElementById('modal-body-content').innerHTML = accionActual.contenido;
+            
+            const comentarioGroup = document.getElementById('comentario-group');
+            comentarioGroup.style.display = 'none';
+
+            const btnConfirmar = document.getElementById('confirmar-accion');
+            btnConfirmar.textContent = accionActual.btnTexto;
+            btnConfirmar.className = `btn ${accionActual.btnClase}`;
+
+            document.getElementById('action-modal').classList.add('show');
+        }
+
+        // Ejecutar acción (con debug completo)
+        function ejecutarAccion() {
+            try {
+                console.log('🚀 Ejecutando acción...');
+                console.log('📝 accionActual:', accionActual);
+                
+                if (!accionActual) {
+                    throw new Error('accionActual es null o undefined');
+                }
+
+                const comentario = document.getElementById('comentario-admin').value;
+                console.log('💬 Comentario:', comentario);
+                console.log('🔄 Tipo de acción:', accionActual.tipo);
+
+                // Simular procesamiento
+                switch (accionActual.tipo) {
+                    case 'aprobar_canasta':
+                        console.log('➡️ Ejecutando aprobar_canasta');
+                        procesarAprobacionCanasta(accionActual.id, comentario);
+                        break;
+                    case 'rechazar_canasta':
+                        console.log('➡️ Ejecutando rechazar_canasta');
+                        procesarRechazoCanasta(accionActual.id, comentario);
+                        break;
+                    case 'aprobar_comercio':
+                        console.log('➡️ Ejecutando aprobar_comercio');
+                        procesarAprobacionComercio(accionActual.id, comentario);
+                        break;
+                    case 'rechazar_comercio':
+                    case 'rechazar_comercio_directo':
+                        console.log('➡️ Ejecutando rechazar_comercio');
+                        procesarRechazoComercio(accionActual.id, comentario);
+                        break;
+                    case 'solicitar_info':
+                        console.log('➡️ Ejecutando solicitar_info');
+                        procesarSolicitudInfo(accionActual.id, comentario);
+                        break;
+                    case 'agregar_comercio':
+                        console.log('➡️ Ejecutando agregar_comercio');
+                        procesarAgregarComercio();
+                        break;
+                    case 'editar_comercio':
+                        console.log('➡️ Ejecutando editar_comercio');
+                        procesarEditarComercio(accionActual.id);
+                        break;
+                    case 'ver_comercio':
+                        console.log('➡️ Solo cerrar modal (ver_comercio)');
+                        break;
+                    default:
+                        console.error('❌ Acción no reconocida:', accionActual.tipo);
+                        mostrarNotificacion('❌ Error: Acción no reconocida - ' + accionActual.tipo);
+                        return;
+                }
+
+                console.log('✅ Acción ejecutada, cerrando modal...');
+                cerrarModal();
+                
+            } catch (error) {
+                console.error('❌ Error en ejecutarAccion:', error);
+                console.error('📊 Stack trace:', error.stack);
+                mostrarNotificacion('❌ Error al ejecutar acción: ' + error.message);
+            }
+        }
+
+        // Procesar agregar comercio
+        function procesarAgregarComercio() {
+            const nombre = document.getElementById('nuevo-nombre').value;
+            const propietario = document.getElementById('nuevo-propietario').value;
+            const direccion = document.getElementById('nueva-direccion').value;
+            const telefono = document.getElementById('nuevo-telefono').value;
+            const email = document.getElementById('nuevo-email').value;
+            const tipo = document.getElementById('nuevo-tipo').value;
+            const canasta = document.getElementById('nueva-canasta').value;
+
+            if (!nombre || !propietario || !direccion || !tipo || !canasta) {
+                mostrarNotificacion('❌ Por favor completa todos los campos obligatorios');
+                return;
+            }
+
+            // Generar nuevo ID
+            const nuevoId = `${tipo.substring(0, 3).toUpperCase()}-${String(comercios.length + 100).padStart(3, '0')}`;
+            
+            // Agregar al array
+            const nuevoComercio = {
+                id: nuevoId,
+                nombre: nombre,
+                propietario: propietario,
+                direccion: direccion,
+                telefono: telefono,
+                email: email,
+                tipo: tipo.charAt(0).toUpperCase() + tipo.slice(1),
+                donaciones: '$0',
+                estado: 'pendiente',
+                canasta: canasta,
+                fechaRegistro: new Date().toLocaleDateString('es-AR')
+            };
+            
+            comercios.push(nuevoComercio);
+            actualizarTablaComercio();
+            
+            // ✅ ACTUALIZAR SECCIÓN VALIDACIONES
+            actualizarSolicitudesPendientes(1); // Aumentar badge
+            regenerarSeccionValidaciones(); // Regenerar completamente la sección validaciones
+
+            mostrarNotificacion('✅ Comercio agregado y enviado para validación');
+            console.log('🏪 Nuevo comercio agregado:', nuevoComercio);
+        }
+
+        // Procesar editar comercio
+        function procesarEditarComercio(comercioId) {
+            const nombre = document.getElementById('edit-nombre').value;
+            const propietario = document.getElementById('edit-propietario').value;
+            const direccion = document.getElementById('edit-direccion').value;
+            const telefono = document.getElementById('edit-telefono').value;
+            const estado = document.getElementById('edit-estado').value;
+
+            // Actualizar en el array
+            const comercio = comercios.find(c => c.id === comercioId);
+            if (comercio) {
+                comercio.nombre = nombre;
+                comercio.propietario = propietario;
+                comercio.direccion = direccion;
+                comercio.telefono = telefono;
+                comercio.estado = estado;
+                
+                actualizarTablaComercio();
+                mostrarNotificacion('✅ Comercio actualizado exitosamente');
+            }
+        }
+
+        // Actualizar tabla de comercios
+        function actualizarTablaComercio() {
+            const tbody = document.querySelector('#comercios-section table tbody');
+            
+            tbody.innerHTML = comercios.map(comercio => {
+                const estadoBadge = {
+                    'activo': '<span class="status-badge active">Activo</span>',
+                    'pendiente': '<span class="status-badge pending">Pendiente</span>',
+                    'rechazado': '<span class="status-badge rejected">Rechazado</span>',
+                    'suspendido': '<span class="status-badge pending">Suspendido</span>',
+                    'inactivo': '<span class="status-badge rejected">Inactivo</span>'
+                };
+                
+                let botones = '';
+                if (comercio.estado === 'pendiente') {
+                    botones = `
+                        <button class="btn btn-success" onclick="validarComercioEnTabla('${comercio.id}')">Validar</button>
+                        <button class="btn btn-danger" onclick="rechazarComercioDirecto('${comercio.id}')">Rechazar</button>
+                    `;
+                } else {
+                    botones = `
+                        <button class="btn btn-secondary" onclick="verComercio('${comercio.id}')">Ver</button>
+                        <button class="btn btn-primary" onclick="editarComercio('${comercio.id}')">Editar</button>
+                    `;
+                }
+                
+                return `
+                    <tr>
+                        <td>
+                            <div style="font-weight: 600;">${comercio.nombre}</div>
+                            <div style="font-size: 12px; color: #6b7280;">ID: ${comercio.id}</div>
+                        </td>
+                        <td>${comercio.direccion}</td>
+                        <td>${comercio.tipo}</td>
+                        <td>${comercio.donaciones}</td>
+                        <td>${estadoBadge[comercio.estado]}</td>
+                        <td>${botones}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Validar comercio desde tabla
+        function validarComercioEnTabla(comercioId) {
+            const comercio = comercios.find(c => c.id === comercioId);
+            if (comercio) {
+                comercio.estado = 'activo';
+                actualizarTablaComercio();
+                mostrarNotificacion('✅ Comercio validado y activado exitosamente');
+                
+                setTimeout(() => {
+                    mostrarNotificacion('📧 Credenciales de acceso enviadas');
+                }, 2000);
+            }
+        }
+
+        // Procesar rechazo de comercio
+        function procesarRechazoComercio(comercioId, comentario) {
+            const comercio = comercios.find(c => c.id === comercioId);
+            if (comercio) {
+                comercio.estado = 'rechazado';
+                actualizarTablaComercio();
+            }
+            
+            mostrarNotificacion('❌ Comercio rechazado');
+            if (solicitudesPendientes > 0) {
+                actualizarSolicitudesPendientes(-1);
+            }
+            
+            console.log(`❌ Comercio ${comercioId} rechazado`, {
+                administrador: 'admin',
+                fecha: new Date(),
+                comentario: comentario,
+                accion: 'rechazar_comercio'
+            });
+        }
+
+        // Funciones adicionales que faltaban
+        function solicitarDocumentacion(comercioId) {
+            mostrarNotificacion('📎 Solicitud de documentación enviada');
+            console.log(`📎 Documentación solicitada: ${comercioId}`);
+        }
+
+        // Actualizar contador de solicitudes pendientes
+        function actualizarSolicitudesPendientes(cambio) {
+            solicitudesPendientes += cambio;
+            const badges = document.querySelectorAll('.notification-badge');
+            badges.forEach(badge => {
+                if (solicitudesPendientes > 0) {
+                    badge.textContent = solicitudesPendientes;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            });
+        }
+
+        // Funciones para la sección de COMERCIOS
+        
+        // Versión simplificada para debug (MOVIDA AQUÍ)
+        function procesarAprobacionComercioSimple(comercioId, comentario) {
+            try {
+                console.log('🔄 VERSIÓN SIMPLE - Procesando aprobación de comercio:', comercioId);
+                
+                // Actualizar comercio en array
+                const comercio = comercios.find(c => c.id === comercioId);
+                if (!comercio) {
+                    throw new Error(`Comercio ${comercioId} no encontrado`);
+                }
+                
+                console.log('📝 Comercio encontrado:', comercio);
+                
+                comercio.estado = 'activo';
+                console.log('✅ Estado cambiado a activo');
+                
+                // Solo actualizar tabla, SIN regenerar validaciones
+                console.log('🔄 Actualizando solo tabla de comercios...');
+                actualizarTablaComercio();
+                console.log('✅ Tabla actualizada');
+                
+                // Actualizar badges manualmente
+                solicitudesPendientes--;
+                if (solicitudesPendientes < 0) solicitudesPendientes = 0;
+                actualizarSolicitudesPendientes(0);
+                console.log('✅ Badges actualizados');
+
+                mostrarNotificacion('✅ Comercio aprobado (versión simple)');
+                console.log('✅ Notificación mostrada');
+                
+            } catch (error) {
+                console.error('❌ Error en versión simple:', error);
+                mostrarNotificacion('❌ Error: ' + error.message);
+            }
+        }
+
+        function agregarComercio() {
+            accionActual = {
+                tipo: 'agregar_comercio',
+                titulo: '🏪 Agregar Nuevo Comercio',
+                contenido: `
+                    <div class="form-group">
+                        <label class="form-label">Nombre del Comercio</label>
+                        <input type="text" class="form-control" id="nuevo-nombre" placeholder="Ej: Panadería La Esquina">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Propietario</label>
+                        <input type="text" class="form-control" id="nuevo-propietario" placeholder="Nombre del propietario">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Dirección</label>
+                        <input type="text" class="form-control" id="nueva-direccion" placeholder="Calle 123, Barrio">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Teléfono</label>
+                        <input type="tel" class="form-control" id="nuevo-telefono" placeholder="11 1234-5678">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="nuevo-email" placeholder="contacto@comercio.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Comercio</label>
+                        <select class="form-control" id="nuevo-tipo">
+                            <option value="">Seleccionar tipo</option>
+                            <option value="panaderia">Panadería</option>
+                            <option value="verduleria">Verdulería</option>
+                            <option value="almacen">Almacén</option>
+                            <option value="supermercado">Supermercado</option>
+                            <option value="farmacia">Farmacia</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Canasta Propuesta (precio $720)</label>
+                        <textarea class="form-control textarea" id="nueva-canasta" placeholder="Describe los productos que ofrecerá..."></textarea>
+                    </div>
+                `,
+                btnTexto: 'Crear Comercio',
+                btnClase: 'btn-primary'
+            };
+            mostrarModalPersonalizado();
+        }
+
+        function verComercio(comercioId) {
+            const comercios = {
+                'PSJ-001': {
+                    nombre: 'Panadería San Juan',
+                    propietario: 'Juan Pérez',
+                    direccion: 'Av. San Juan 1234, Barracas',
+                    telefono: '11 4567-8901',
+                    email: 'juan@panaderiasanjuan.com',
+                    tipo: 'Panadería',
+                    donaciones: '$8.640',
+                    entregas: 12,
+                    canasta: 'Pan lactal + 6 facturas + 4 medialunas + 2 prepizzas',
+                    fechaRegistro: '15 Jun 2025',
+                    estado: 'Activo'
+                },
+                'ADP-003': {
+                    nombre: 'Almacén Don Pedro',
+                    propietario: 'Pedro González',
+                    direccion: 'Corrientes 890, Almagro',
+                    telefono: '11 2345-6789',
+                    email: 'pedro@donpedro.com',
+                    tipo: 'Almacén',
+                    donaciones: '$5.760',
+                    entregas: 8,
+                    canasta: 'Leche larga vida + Fideos + Arroz + Aceite + Conservas',
+                    fechaRegistro: '10 Jun 2025',
+                    estado: 'Activo'
+                }
+            };
+
+            const comercio = comercios[comercioId];
+            if (comercio) {
+                accionActual = {
+                    tipo: 'ver_comercio',
+                    titulo: `🏪 ${comercio.nombre}`,
+                    contenido: `
+                        <div class="comercio-detail">
+                            <div class="comercio-info">
+                                <div class="info-item">
+                                    <div class="info-label">Propietario</div>
+                                    <div class="info-value">${comercio.propietario}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Dirección</div>
+                                    <div class="info-value">${comercio.direccion}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Teléfono</div>
+                                    <div class="info-value">${comercio.telefono}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Email</div>
+                                    <div class="info-value">${comercio.email}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Tipo</div>
+                                    <div class="info-value">${comercio.tipo}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Estado</div>
+                                    <div class="info-value"><span class="status-badge active">${comercio.estado}</span></div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 20px;">
+                                <div class="info-label">Canasta Actual ($720)</div>
+                                <div class="info-value">${comercio.canasta}</div>
+                            </div>
+                            <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                                <div style="text-align: center; padding: 15px; background: #f0f9ff; border-radius: 8px;">
+                                    <div style="font-size: 24px; font-weight: bold; color: #2563eb;">${comercio.donaciones}</div>
+                                    <div style="font-size: 12px; color: #6b7280;">Total Donaciones</div>
+                                </div>
+                                <div style="text-align: center; padding: 15px; background: #f0fdf4; border-radius: 8px;">
+                                    <div style="font-size: 24px; font-weight: bold; color: #16a34a;">${comercio.entregas}</div>
+                                    <div style="font-size: 12px; color: #6b7280;">Entregas Realizadas</div>
+                                </div>
+                                <div style="text-align: center; padding: 15px; background: #fef3c7; border-radius: 8px;">
+                                    <div style="font-size: 24px; font-weight: bold; color: #f59e0b;">${comercio.fechaRegistro}</div>
+                                    <div style="font-size: 12px; color: #6b7280;">Fecha Registro</div>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    btnTexto: 'Cerrar',
+                    btnClase: 'btn-secondary',
+                    soloVer: true
+                };
+                mostrarModalPersonalizado();
+            }
+        }
+
+        function editarComercio(comercioId) {
+            accionActual = {
+                tipo: 'editar_comercio',
+                id: comercioId,
+                titulo: `✏️ Editar Comercio ${comercioId}`,
+                contenido: `
+                    <div class="form-group">
+                        <label class="form-label">Nombre del Comercio</label>
+                        <input type="text" class="form-control" id="edit-nombre" value="Panadería San Juan">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Propietario</label>
+                        <input type="text" class="form-control" id="edit-propietario" value="Juan Pérez">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Dirección</label>
+                        <input type="text" class="form-control" id="edit-direccion" value="Av. San Juan 1234, Barracas">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Teléfono</label>
+                        <input type="tel" class="form-control" id="edit-telefono" value="11 4567-8901">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Estado</label>
+                        <select class="form-control" id="edit-estado">
+                            <option value="activo" selected>Activo</option>
+                            <option value="suspendido">Suspendido</option>
+                            <option value="inactivo">Inactivo</option>
+                        </select>
+                    </div>
+                `,
+                btnTexto: 'Guardar Cambios',
+                btnClase: 'btn-primary'
+            };
+            mostrarModalPersonalizado();
+        }
+
+        function rechazarComercioDirecto(comercioId) {
+            accionActual = {
+                tipo: 'rechazar_comercio_directo',
+                id: comercioId,
+                titulo: '❌ Rechazar Comercio',
+                contenido: `¿Estás seguro de que quieres rechazar este comercio? Esta acción cambiará su estado y no podrá recibir donaciones.`,
+                btnTexto: 'Rechazar',
+                btnClase: 'btn-danger',
+                requiereComentario: true
+            };
+            mostrarModal();
+        }
+
+        // Actualizar contador de solicitudes pendientes
+        function actualizarSolicitudesPendientes(cambio) {
+            solicitudesPendientes += cambio;
+            const badges = document.querySelectorAll('.notification-badge');
+            badges.forEach(badge => {
+                if (solicitudesPendientes > 0) {
+                    badge.textContent = solicitudesPendientes;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            });
+        }
+
+        // Mostrar notificación
+        function mostrarNotificacion(mensaje) {
+            const notificacion = document.createElement('div');
+            notificacion.className = 'notification';
+            notificacion.textContent = mensaje;
+            
+            document.body.appendChild(notificacion);
+            
+            setTimeout(() => {
+                notificacion.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                notificacion.classList.remove('show');
+                setTimeout(() => {
+                    if (document.body.contains(notificacion)) {
+                        document.body.removeChild(notificacion);
+                    }
+                }, 300);
+            }, 4000);
+        }
+
+        // Funciones de monitoreo que faltaban
+        function revisarBeneficiario(beneficiarioId) {
+            accionActual = {
+                tipo: 'revisar_beneficiario',
+                id: beneficiarioId,
+                titulo: '🔍 Revisar Beneficiario',
+                contenido: `
+                    <div class="alert alert-warning">
+                        <strong>⚠️ Actividad Sospechosa Detectada</strong><br>
+                        Este beneficiario ha realizado múltiples retiros en poco tiempo.
+                    </div>
+                    <div class="comercio-detail">
+                        <div class="comercio-info">
+                            <div class="info-item">
+                                <div class="info-label">Beneficiario</div>
+                                <div class="info-value">Carlos Mendez</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Método ID</div>
+                                <div class="info-value">Solo nombre</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Comercio Principal</div>
+                                <div class="info-value">Panadería San Juan</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Total Retiros</div>
+                                <div class="info-value">3 en 2 días</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Última Actividad</div>
+                                <div class="info-value">Hace 30 minutos</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Estado</div>
+                                <div class="info-value"><span class="status-badge pending">Bajo Revisión</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <h5>Acciones Disponibles:</h5>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <button class="btn btn-success" onclick="aprobarBeneficiario('${beneficiarioId}')">✅ Marcar como Válido</button>
+                            <button class="btn btn-danger" onclick="bloquearBeneficiario('${beneficiarioId}')">🚫 Bloquear Usuario</button>
+                            <button class="btn btn-secondary" onclick="solicitarVerificacion('${beneficiarioId}')">📋 Solicitar Verificación</button>
+                        </div>
+                    </div>
+                `,
+                btnTexto: 'Cerrar',
+                btnClase: 'btn-secondary',
+                soloVer: true
+            };
+            mostrarModalPersonalizado();
+        }
+
+        function bloquearBeneficiario(beneficiarioId) {
+            if (confirm('¿Estás seguro de que quieres bloquear a este beneficiario? No podrá retirar más productos.')) {
+                mostrarNotificacion('🚫 Beneficiario bloqueado del sistema');
+                console.log(`🚫 Beneficiario bloqueado: ${beneficiarioId}`);
+                cerrarModal(); // Cerrar modal si está abierto
+            }
+        }
+
+        function aprobarBeneficiario(beneficiarioId) {
+            mostrarNotificacion('✅ Beneficiario marcado como válido');
+            console.log(`✅ Beneficiario aprobado: ${beneficiarioId}`);
+            cerrarModal();
+        }
+
+        function solicitarVerificacion(beneficiarioId) {
+            mostrarNotificacion('📋 Solicitud de verificación enviada al comercio');
+            console.log(`📋 Verificación solicitada: ${beneficiarioId}`);
+            cerrarModal();
+        }
+
+        function validarComercio(comercioId) {
+            mostrarNotificacion('✅ Comercio validado exitosamente');
+            console.log(`✅ Comercio validado: ${comercioId}`);
+            
+            // Simular actualización del estado en la tabla
+            setTimeout(() => {
+                mostrarNotificacion('📧 Credenciales de acceso enviadas');
+            }, 2000);
+        }
+
+        // Procesar rechazo de comercio
+        function procesarRechazoComercio(comercioId, comentario) {
+            const comercio = comercios.find(c => c.id === comercioId);
+            if (comercio) {
+                comercio.estado = 'rechazado';
+                actualizarTablaComercio();
+                regenerarSeccionValidaciones();
+            }
+            
+            mostrarNotificacion('❌ Comercio rechazado');
+            
+            console.log(`❌ Comercio ${comercioId} rechazado`, {
+                administrador: 'admin',
+                fecha: new Date(),
+                comentario: comentario,
+                accion: 'rechazar_comercio'
+            });
+        }
+
+        // Procesar solicitud de información
+        function procesarSolicitudInfo(solicitudId, comentario) {
+            mostrarNotificacion('📝 Solicitud de información enviada');
+            
+            console.log(`📝 Info solicitada para ${solicitudId}`, {
+                administrador: 'admin',
+                fecha: new Date(),
+                comentario: comentario,
+                accion: 'solicitar_info'
+            });
+        }
+
+        // Cerrar modal al hacer click fuera
+        document.getElementById('action-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                cerrarModal();
+            }
+        });
+
+        function verComercio(comercioId) {
+            const comercio = comercios.find(c => c.id === comercioId);
+            
+            if (comercio) {
+                accionActual = {
+                    tipo: 'ver_comercio',
+                    titulo: `🏪 ${comercio.nombre}`,
+                    contenido: `
+                        <div class="comercio-detail">
+                            <div class="comercio-info">
+                                <div class="info-item">
+                                    <div class="info-label">Propietario</div>
+                                    <div class="info-value">${comercio.propietario}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Dirección</div>
+                                    <div class="info-value">${comercio.direccion}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Teléfono</div>
+                                    <div class="info-value">${comercio.telefono}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Email</div>
+                                    <div class="info-value">${comercio.email}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Tipo</div>
+                                    <div class="info-value">${comercio.tipo}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Estado</div>
+                                    <div class="info-value"><span class="status-badge ${comercio.estado === 'activo' ? 'active' : 'pending'}">${comercio.estado.charAt(0).toUpperCase() + comercio.estado.slice(1)}</span></div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 20px;">
+                                <div class="info-label">Canasta Actual ($720)</div>
+                                <div class="info-value">Pan lactal + 6 facturas + 4 medialunas + 2 prepizzas</div>
+                            </div>
+                            <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                                <div style="text-align: center; padding: 15px; background: #f0f9ff; border-radius: 8px;">
+                                    <div style="font-size: 24px; font-weight: bold; color: #2563eb;">${comercio.donaciones}</div>
+                                    <div style="font-size: 12px; color: #6b7280;">Total Donaciones</div>
+                                </div>
+                                <div style="text-align: center; padding: 15px; background: #f0fdf4; border-radius: 8px;">
+                                    <div style="font-size: 24px; font-weight: bold; color: #16a34a;">12</div>
+                                    <div style="font-size: 12px; color: #6b7280;">Entregas Realizadas</div>
+                                </div>
+                                <div style="text-align: center; padding: 15px; background: #fef3c7; border-radius: 8px;">
+                                    <div style="font-size: 24px; font-weight: bold; color: #f59e0b;">15 Jun 2025</div>
+                                    <div style="font-size: 12px; color: #6b7280;">Fecha Registro</div>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    btnTexto: 'Cerrar',
+                    btnClase: 'btn-secondary',
+                    soloVer: true
+                };
+                mostrarModalPersonalizado();
+            }
+        }
+
+        function editarComercio(comercioId) {
+            const comercio = comercios.find(c => c.id === comercioId);
+            
+            if (comercio) {
+                accionActual = {
+                    tipo: 'editar_comercio',
+                    id: comercioId,
+                    titulo: `✏️ Editar ${comercio.nombre}`,
+                    contenido: `
+                        <div class="form-group">
+                            <label class="form-label">Nombre del Comercio</label>
+                            <input type="text" class="form-control" id="edit-nombre" value="${comercio.nombre}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Propietario</label>
+                            <input type="text" class="form-control" id="edit-propietario" value="${comercio.propietario}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Dirección</label>
+                            <input type="text" class="form-control" id="edit-direccion" value="${comercio.direccion}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Teléfono</label>
+                            <input type="tel" class="form-control" id="edit-telefono" value="${comercio.telefono}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Estado</label>
+                            <select class="form-control" id="edit-estado">
+                                <option value="activo" ${comercio.estado === 'activo' ? 'selected' : ''}>Activo</option>
+                                <option value="suspendido" ${comercio.estado === 'suspendido' ? 'selected' : ''}>Suspendido</option>
+                                <option value="inactivo" ${comercio.estado === 'inactivo' ? 'selected' : ''}>Inactivo</option>
+                            </select>
+                        </div>
+                    `,
+                    btnTexto: 'Guardar Cambios',
+                    btnClase: 'btn-primary'
+                };
+                mostrarModalPersonalizado();
+            }
+        }
+
+        // Inicialización cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🏛️ Panel de Administrador iniciado');
+            
+            // Actualizar tabla inicial
+            actualizarTablaComercio();
+            
+            // Simular carga de datos en tiempo real
+            setTimeout(() => {
+                mostrarNotificacion('📊 Datos actualizados en tiempo real');
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

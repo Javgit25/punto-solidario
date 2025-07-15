@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seguimiento de Donación - Doná Tu Comida</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 450px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            padding: 30px 25px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .donation-summary {
+            background: #f8fafc;
+            padding: 25px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .donation-id {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 15px;
+            font-family: monospace;
+        }
+
+        .donation-amount {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .donation-date {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .comercio-card {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .comercio-name {
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+
+        .comercio-address {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .status-section {
+            padding: 25px;
+        }
+
+        .status-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .status-timeline {
+            position: relative;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 25px;
+            position: relative;
+            padding-left: 60px;
+        }
+
+        .status-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .status-item::before {
+            content: '';
+            position: absolute;
+            left: 18px;
+            top: 40px;
+            width: 2px;
+            height: calc(100% + 10px);
+            background: #e2e8f0;
+        }
+
+        .status-item:last-child::before {
+            display: none;
+        }
+
+        .status-icon {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .status-icon.completed {
+            background: #16a34a;
+            color: white;
+        }
+
+        .status-icon.current {
+            background: #2563eb;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .status-icon.pending {
+            background: #f1f5f9;
+            color: #64748b;
+            border: 2px solid #cbd5e1;
+        }
+
+        .status-content {
+            flex: 1;
+        }
+
+        .status-step {
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+
+        .status-description {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .status-time {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .status-proof {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .proof-image {
+            width: 60px;
+            height: 60px;
+            background: #f3f4f6;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .proof-image:hover {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .proof-image.has-image {
+            background: #dcfce7;
+            border-color: #16a34a;
+            color: #15803d;
+        }
+
+        .impact-section {
+            background: #f0fdf4;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .impact-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #15803d;
+            margin-bottom: 15px;
+        }
+
+        .impact-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .impact-stat {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #bbf7d0;
+        }
+
+        .impact-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #16a34a;
+        }
+
+        .impact-label {
+            font-size: 12px;
+            color: #374151;
+            margin-top: 5px;
+        }
+
+        .share-section {
+            padding: 25px;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .share-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 0 5px;
+            transition: all 0.3s ease;
+        }
+
+        .share-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+        }
+
+        .back-btn {
+            background: #f1f5f9;
+            color: #374151;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #e2e8f0;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            max-width: 90%;
+            max-height: 90%;
+            text-align: center;
+        }
+
+        .modal-image {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 8px;
+        }
+
+        .close-modal {
+            margin-top: 15px;
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">🍞 Doná Tu Comida</div>
+            <div class="subtitle">Seguimiento de tu donación</div>
+        </div>
+
+        <!-- Resumen de donación -->
+        <div class="donation-summary">
+            <div class="donation-id">ID: DTC-2025-001847</div>
+            <div class="donation-amount">$1.000 donados</div>
+            <div class="donation-date">15 de Julio, 2025 - 14:32hs</div>
+            
+            <div class="comercio-card">
+                <div class="comercio-name">Panadería San Juan</div>
+                <div class="comercio-address">Av. San Juan 1234, Barracas</div>
+            </div>
+        </div>
+
+        <!-- Estado de la donación -->
+        <div class="status-section">
+            <div class="status-title">Estado de tu donación</div>
+            
+            <div class="status-timeline">
+                <!-- Paso 1: Donación recibida -->
+                <div class="status-item">
+                    <div class="status-icon completed">✓</div>
+                    <div class="status-content">
+                        <div class="status-step">Donación Recibida</div>
+                        <div class="status-description">Tu pago fue procesado exitosamente</div>
+                        <div class="status-time">Hace 2 horas</div>
+                    </div>
+                </div>
+
+                <!-- Paso 2: Canasta disponible -->
+                <div class="status-item">
+                    <div class="status-icon completed">✓</div>
+                    <div class="status-content">
+                        <div class="status-step">Canasta Disponible</div>
+                        <div class="status-description">1 canasta + $200 acumulados en Panadería San Juan</div>
+                        <div class="status-time">Hace 2 horas</div>
+                    </div>
+                </div>
+
+                <!-- Paso 3: Entregada (actual) -->
+                <div class="status-item">
+                    <div class="status-icon current">📦</div>
+                    <div class="status-content">
+                        <div class="status-step">Entregada a Persona Necesitada</div>
+                        <div class="status-description">María González retiró tu canasta solidaria</div>
+                        <div class="status-time">Hace 30 minutos</div>
+                        <div class="status-proof">
+                            <div class="proof-image has-image" onclick="abrirImagen('comprobante1')">
+                                📄<br><small>Ticket</small>
+                            </div>
+                            <div class="proof-image has-image" onclick="abrirImagen('productos1')">
+                                📸<br><small>Productos</small>
+                            </div>
+                            <div class="proof-image has-image" onclick="abrirImagen('persona1')">
+                                👤<br><small>Entrega</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paso 4: Pago procesado -->
+                <div class="status-item">
+                    <div class="status-icon completed">💳</div>
+                    <div class="status-content">
+                        <div class="status-step">Pago al Comercio</div>
+                        <div class="status-description">$720 transferidos a Panadería San Juan</div>
+                        <div class="status-time">Hace 15 minutos</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Impacto generado -->
+        <div class="impact-section">
+            <div class="impact-title">🌟 Tu impacto en números</div>
+            
+            <div class="impact-stats">
+                <div class="impact-stat">
+                    <div class="impact-number">1</div>
+                    <div class="impact-label">Persona ayudada</div>
+                </div>
+                <div class="impact-stat">
+                    <div class="impact-number">4</div>
+                    <div class="impact-label">Productos entregados</div>
+                </div>
+            </div>
+
+            <div style="font-size: 14px; color: #374151; margin-bottom: 15px;">
+                <strong>Tus $200 adicionales</strong> se acumularon para formar futuras canastas en este comercio.
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="share-section">
+            <button class="share-btn" onclick="compartirWhatsApp()">📱 Compartir en WhatsApp</button>
+            <button class="share-btn" onclick="descargarComprobante()">📄 Descargar Comprobante</button>
+            <br><br>
+            <button class="back-btn" onclick="volverAlInicio()">← Volver al inicio</button>
+        </div>
+    </div>
+
+    <!-- Modal para imágenes -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <img class="modal-image" id="modal-image" src="" alt="Comprobante">
+            <br>
+            <button class="close-modal" onclick="cerrarModal()">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        // Datos de ejemplo de la donación
+        const donacionData = {
+            id: 'DTC-2025-001847',
+            monto: 1000,
+            fecha: '15 de Julio, 2025 - 14:32hs',
+            comercio: {
+                nombre: 'Panadería San Juan',
+                direccion: 'Av. San Juan 1234, Barracas'
+            },
+            canastas: 1,
+            dineroAdicional: 200,
+            persona: 'María González',
+    <script>
+        // Datos de ejemplo de la donación
+        const donacionData = {
+            id: 'DTC-2025-001847',
+            monto: 1000,
+            fecha: '15 de Julio, 2025 - 14:32hs',
+            comercio: {
+                nombre: 'Panadería San Juan',
+                direccion: 'Av. San Juan 1234, Barracas'
+            },
+            canastas: 1,
+            dineroAdicional: 200,
+            persona: 'María González',
+            productos: ['Pan lactal', '6 facturas', '4 medialunas', '2 prepizzas'],
+            imagenes: {
+                comprobante1: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNiIgZmlsbD0iIzM3NDE1MSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkNvbXByb2JhbnRlIGRlIENvbXByYTwvdGV4dD48L3N2Zz4=',
+                productos1: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmOWZmIi8+PHRleHQgeD0iNTAlIiB5PSI0MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI0MCIgZmlsbD0iIzE2YTM0YSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+🍞</L3RleHQ+PHRleHQgeD0iNTAlIiB5PSI2NSUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzM3NDE1MSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+UHJvZHVjdG9zIEVudHJlZ2Fkb3M8L3RleHQ+PC9zdmc+',
+                persona1: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWZmNmZmIi8+PHRleHQgeD0iNTAlIiB5PSI0MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI0MCIgZmlsbD0iIzI1NjNlYiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+👤</L3RleHQ+PHRleHQgeD0iNTAlIiB5PSI2NSUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzM3NDE1MSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+TWFyw61hIEdvbnrDoWxlejwvdGV4dD48L3N2Zz4='
+            }
+        };
+
+        // Función para abrir imagen en modal
+        function abrirImagen(tipo) {
+            const modal = document.getElementById('modal');
+            const modalImage = document.getElementById('modal-image');
+            
+            if (donacionData.imagenes[tipo]) {
+                modalImage.src = donacionData.imagenes[tipo];
+                modal.classList.add('show');
+            }
+        }
+
+        // Función para cerrar modal
+        function cerrarModal() {
+            document.getElementById('modal').classList.remove('show');
+        }
+
+        // Cerrar modal al hacer click fuera
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                cerrarModal();
+            }
+        });
+
+        // Función para compartir en WhatsApp
+        function compartirWhatsApp() {
+            const mensaje = `🍞 ¡Acabo de ayudar a través de Doná Tu Comida!
+
+💰 Doné: ${donacionData.monto.toLocaleString()}
+🏪 Comercio: ${donacionData.comercio.nombre}
+👤 Persona ayudada: ${donacionData.persona}
+📍 ${donacionData.comercio.direccion}
+
+${donacionData.canastas} canasta${donacionData.canastas > 1 ? 's' : ''} entregada${donacionData.canastas > 1 ? 's' : ''} con total transparencia. 
+
+¡Súmate vos también! 🙌
+
+#DonaciónTransparente #AyudaDirecta`;
+
+            const url = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
+            window.open(url, '_blank');
+        }
+
+        // Función para descargar comprobante
+        function descargarComprobante() {
+            // Simular descarga de PDF
+            const comprobante = `COMPROBANTE DE DONACIÓN
+
+Doná Tu Comida - Ayuda Transparente
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ID de Donación: ${donacionData.id}
+Fecha: ${donacionData.fecha}
+
+DONANTE
+Monto donado: ${donacionData.monto.toLocaleString()}
+
+COMERCIO BENEFICIARIO
+${donacionData.comercio.nombre}
+${donacionData.comercio.direccion}
+
+ENTREGA REALIZADA
+Persona beneficiaria: ${donacionData.persona}
+Productos entregados: ${donacionData.productos.join(', ')}
+Canastas: ${donacionData.canastas}
+Dinero adicional acumulado: ${donacionData.dineroAdicional}
+
+DISTRIBUCIÓN
+• Al comercio: ${(donacionData.monto * 0.9).toLocaleString()}
+• Operación plataforma: ${(donacionData.monto * 0.1).toLocaleString()}
+
+¡Gracias por tu solidaridad!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+www.donatucomida.com`;
+
+            // Crear y descargar archivo
+            const elemento = document.createElement('a');
+            const archivo = new Blob([comprobante], {type: 'text/plain'});
+            elemento.href = URL.createObjectURL(archivo);
+            elemento.download = `Comprobante_${donacionData.id}.txt`;
+            documento.body.appendChild(elemento);
+            elemento.click();
+            documento.body.removeChild(elemento);
+        }
+
+        // Función para volver al inicio
+        function volverAlInicio() {
+            // En la implementación real, esto redirigiría a la página principal
+            if (confirm('¿Quieres hacer otra donación?')) {
+                window.history.back();
+            }
+        }
+
+        // Simular actualizaciones en tiempo real
+        function simularActualizacionesEnTiempoReal() {
+            // Esta función simularía actualizaciones WebSocket
+            console.log('🔄 Verificando actualizaciones de la donación...');
+            
+            // En la implementación real:
+            // - Conectaría con WebSocket
+            // - Recibiría notificaciones de nuevas entregas
+            // - Actualizaría el estado automáticamente
+            // - Mostraría notificaciones push
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cargar datos dinámicos si vienen de URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const donacionId = urlParams.get('id');
+            
+            if (donacionId) {
+                // En implementación real, cargaría datos desde API
+                console.log(`🔍 Cargando datos para donación: ${donacionId}`);
+            }
+
+            // Simular verificación periódica de actualizaciones
+            setInterval(simularActualizacionesEnTiempoReal, 30000); // Cada 30 segundos
+        });
+
+        // Función para generar más ejemplos de seguimiento
+        function cambiarEstadoEjemplo() {
+            // Esta función permite ver diferentes estados de seguimiento
+            const estados = [
+                {
+                    titulo: 'Donación Pendiente',
+                    descripcion: 'Tu canasta está disponible esperando ser retirada',
+                    icono: '⏳',
+                    clase: 'current'
+                },
+                {
+                    titulo: 'Entrega en Proceso',
+                    descripción: 'Una persona está en el comercio retirando tu canasta',
+                    icono: '🚶',
+                    clase: 'current'
+                },
+                {
+                    titulo: 'Entregada',
+                    descripcion: 'Tu canasta fue entregada exitosamente',
+                    icono: '✅',
+                    clase: 'completed'
+                }
+            ];
+            
+            // Lógica para cambiar estados dinámicamente
+        }
+    </script>
+</body>
+</html>
