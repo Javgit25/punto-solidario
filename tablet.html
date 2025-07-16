@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doná Tu Comida - Tablet Informativa</title>
+    <title>Tablet - Panadería San Juan</title>
+    <meta name="theme-color" content="#2563eb">
+    <link rel="manifest" href="manifest.json">
     <style>
         * {
             margin: 0;
@@ -14,11 +16,12 @@
         body {
             font-family: 'Arial', sans-serif;
             background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
-            padding: 10px;
+            padding: 20px;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
         }
 
         .tablet-container {
@@ -46,20 +49,60 @@
             background: linear-gradient(90deg, #2563eb, #16a34a);
         }
 
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px 0;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #16a34a;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #16a34a;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.offline {
+            background: #dc2626;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .last-update {
+            font-size: 11px;
+            color: #64748b;
+        }
+
         .header {
             text-align: center;
             margin-bottom: 30px;
         }
 
         .logo {
-            font-size: 36px;
+            font-size: 32px;
             font-weight: bold;
             color: #2563eb;
             margin-bottom: 10px;
         }
 
         .subtitle {
-            font-size: 18px;
+            font-size: 16px;
             color: #64748b;
             margin-bottom: 20px;
         }
@@ -81,7 +124,14 @@
 
         .comercio-address {
             color: #64748b;
-            font-size: 16px;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .comercio-hours {
+            font-size: 12px;
+            color: #059669;
+            font-weight: 500;
         }
 
         .stats-container {
@@ -99,6 +149,12 @@
             text-align: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
             border: 2px solid #f1f5f9;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
         }
 
         .stat-card.available {
@@ -124,14 +180,22 @@
         }
 
         .stat-label {
-            font-size: 16px;
+            font-size: 14px;
             color: #64748b;
             margin-bottom: 5px;
+            line-height: 1.2;
         }
 
         .stat-emoji {
-            font-size: 24px;
+            font-size: 20px;
             margin-bottom: 10px;
+        }
+
+        .stat-details {
+            font-size: 12px;
+            color: #16a34a;
+            margin-top: 8px;
+            font-weight: 500;
         }
 
         .donation-section {
@@ -150,13 +214,13 @@
         }
 
         .donation-title {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: bold;
             margin-bottom: 10px;
         }
 
         .donation-subtitle {
-            font-size: 18px;
+            font-size: 16px;
             opacity: 0.9;
         }
 
@@ -177,15 +241,37 @@
             justify-content: center;
             border-radius: 8px;
             color: #64748b;
-            font-size: 14px;
+            font-size: 12px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            position: relative;
         }
 
         .qr-code:hover {
             background: #e2e8f0;
             border-color: #94a3b8;
+            transform: scale(1.05);
+        }
+
+        .qr-tooltip {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 10px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .qr-code:hover .qr-tooltip {
+            opacity: 1;
         }
 
         .footer {
@@ -193,48 +279,127 @@
             justify-content: space-between;
             align-items: center;
             color: #64748b;
-            font-size: 14px;
+            font-size: 12px;
+            margin-top: auto;
+            padding-top: 20px;
         }
 
-        .last-update {
+        .total-helped {
             display: flex;
             align-items: center;
             gap: 5px;
         }
 
-        .live-indicator {
-            width: 8px;
-            height: 8px;
+        .demo-controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 10px;
+            z-index: 1000;
+        }
+
+        .demo-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin: 2px;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .demo-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
             background: #16a34a;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-weight: 500;
+            z-index: 1001;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            max-width: 300px;
         }
 
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+        .notification.show {
+            transform: translateX(0);
         }
 
-        .products-available {
-            margin-top: 10px;
-            color: #16a34a;
-            font-weight: bold;
+        .notification.warning {
+            background: #f59e0b;
         }
 
-        .products-available.empty {
-            color: #dc2626;
+        .notification.error {
+            background: #dc2626;
         }
 
-        .hourly-stats {
-            font-size: 12px;
-            opacity: 0.8;
-            margin-top: 5px;
+        .offline-mode {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            color: #92400e;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
         }
 
-        /* Simulación de datos actualizándose */
+        .offline-mode.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .tablet-container {
+                width: 95vw;
+                padding: 20px;
+                min-height: 400px;
+            }
+
+            .stats-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .donation-section {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .qr-container {
+                margin-left: 0;
+                margin-top: 20px;
+            }
+
+            .donation-title {
+                font-size: 22px;
+            }
+
+            .comercio-name {
+                font-size: 20px;
+            }
+        }
+
+        @media (orientation: landscape) and (max-height: 500px) {
+            .tablet-container {
+                height: 90vh;
+                overflow-y: auto;
+            }
+        }
+
+        /* Animaciones para actualizaciones */
         .stat-number.updating {
-            animation: highlight 3s ease-in-out infinite;
+            animation: highlight 1s ease-in-out;
         }
 
         @keyframes highlight {
@@ -245,163 +410,493 @@
     </style>
 </head>
 <body>
+    <!-- Demo Controls -->
+    <div class="demo-controls">
+        <div style="margin-bottom: 5px;"><strong>🎮 Demo Tablet</strong></div>
+        <button class="demo-btn" onclick="simularDonacion()">💰 Simular Donación</button>
+        <button class="demo-btn" onclick="simularEntrega()">📦 Simular Entrega</button>
+        <button class="demo-btn" onclick="toggleOffline()">📡 Toggle Offline</button>
+        <button class="demo-btn" onclick="irAPanel()">🏪 Panel Comercio</button>
+    </div>
+
     <div class="tablet-container">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="connection-status">
+                <div class="status-indicator" id="status-indicator"></div>
+                <span id="connection-text">ONLINE - Sincronizado</span>
+            </div>
+            <div class="last-update" id="last-update">
+                Última actualización: <span id="update-time">Hace 3 segundos</span>
+            </div>
+        </div>
+
+        <!-- Offline Mode Alert -->
+        <div class="offline-mode" id="offline-alert">
+            <strong>📡 Sin conexión a internet</strong><br>
+            Mostrando última información disponible. Reconectando automáticamente...
+        </div>
+
+        <!-- Header -->
         <div class="header">
             <div class="logo">🍞 Doná Tu Comida</div>
             <div class="subtitle">Ayuda directa y transparente en tu barrio</div>
         </div>
 
+        <!-- Información del comercio -->
         <div class="comercio-info">
             <div class="comercio-name" id="comercio-name">Panadería San Juan</div>
-            <div class="comercio-address" id="comercio-address">Av. San Juan 1234, Barracas</div>
+            <div class="comercio-address" id="comercio-address">📍 Av. San Juan 1234, Barracas</div>
+            <div class="comercio-hours">🕐 Abierto: 7:00 - 20:00 | Donaciones 24hs</div>
         </div>
 
+        <!-- Estadísticas -->
         <div class="stats-container">
             <div class="stat-card available">
                 <div class="stat-emoji">🛒</div>
-                <div class="stat-number updating" id="canastas-disponibles">3</div>
-                <div class="stat-label">Canastas Solidarias</div>
-                <div class="stat-label">Disponibles</div>
-                <div class="products-available" id="contenido-canasta">Pan + Facturas + Medialunas + Prepizzas</div>
-                <div class="hourly-stats" id="dinero-acumulado">+ $450 acumulados</div>
+                <div class="stat-number" id="canastas-disponibles">3</div>
+                <div class="stat-label">Canastas Solidarias<br>Disponibles</div>
+                <div class="stat-details" id="contenido-canasta">Pan + Facturas + Medialunas + Prepizzas</div>
             </div>
 
             <div class="stat-card delivered">
                 <div class="stat-emoji">✅</div>
                 <div class="stat-number" id="personas-ayudadas">8</div>
-                <div class="stat-label">Personas Ayudadas</div>
-                <div class="stat-label">Esta Semana</div>
-                <div class="hourly-stats">2 hoy | 3 ayer</div>
+                <div class="stat-label">Personas Ayudadas<br>Esta Semana</div>
+                <div class="stat-details">2 hoy | 3 ayer | 3 anteriores</div>
             </div>
         </div>
 
+        <!-- Sección de donación -->
         <div class="donation-section">
             <div class="donation-text">
-                <div class="donation-title">🙌 ¡Dona $800 = 1 Canasta Solidaria!</div>
+                <div class="donation-title">💝 ¡Doná $720 = 1 Canasta Solidaria!</div>
                 <div class="donation-subtitle">Escaneá el QR y ayudá con el monto que puedas</div>
             </div>
             <div class="qr-container">
                 <div class="qr-code" onclick="simularEscaneoQR()">
                     📱<br>
-                    QR CODE<br>
+                    <strong>QR CODE</strong><br>
                     <small>Tocá para simular</small>
+                    <div class="qr-tooltip">donatucomida.com/donar/PSJ-001</div>
                 </div>
             </div>
         </div>
 
+        <!-- Footer -->
         <div class="footer">
-            <div class="last-update">
-                <div class="live-indicator"></div>
-                <span>Actualizado: <span id="ultima-actualizacion">Hace 30 segundos</span></span>
+            <div class="total-helped">
+                ❤️ <span id="total-ayudadas">47</span> personas ayudadas en total
             </div>
             <div>
-                <strong>Horario:</strong> 7:00 - 20:00
+                <strong>ID Comercio:</strong> PSJ-001
             </div>
         </div>
     </div>
 
     <script>
-        // Simulación de sistema de canastas
-        let canastasDisponibles = 3;
-        let personasAyudadas = 8;
-        
-        function actualizarDatos() {
-            // Simular cambios en tiempo real para el mismo comercio
-            const random = Math.random();
-            
-            if (random < 0.3) {
-                // Simular nueva donación ($800 = 1 canasta)
-                canastasDisponibles++;
-                document.getElementById('canastas-disponibles').textContent = canastasDisponibles;
-                document.getElementById('canastas-disponibles').classList.add('updating');
-                
-                setTimeout(() => {
-                    document.getElementById('canastas-disponibles').classList.remove('updating');
-                }, 3000);
-            } else if (random < 0.5 && canastasDisponibles > 0) {
-                // Simular entrega de canasta
-                canastasDisponibles--;
-                personasAyudadas++;
-                document.getElementById('canastas-disponibles').textContent = canastasDisponibles;
-                document.getElementById('personas-ayudadas').textContent = personasAyudadas;
-                
-                // Cambiar estado si no hay canastas
-                const contenidoCanasta = document.getElementById('contenido-canasta');
-                if (canastasDisponibles === 0) {
-                    contenidoCanasta.textContent = 'Sin canastas disponibles';
-                    contenidoCanasta.classList.add('empty');
-                } else {
-                    contenidoCanasta.textContent = 'Pan + Facturas + Medialunas + Prepizzas';
-                    contenidoCanasta.classList.remove('empty');
-                }
+        // Estado del sistema
+        var tabletState = {
+            isOnline: true,
+            canastasDisponibles: 3,
+            personasAyudadas: 8,
+            totalAyudadas: 47,
+            lastUpdate: new Date(),
+            comercio: {
+                id: 'PSJ-001',
+                nombre: 'Panadería San Juan',
+                direccion: 'Av. San Juan 1234, Barracas',
+                canasta: 'Pan + Facturas + Medialunas + Prepizzas',
+                precio: 720
             }
+        };
+
+        // Función para mostrar notificaciones
+        function showNotification(message, type) {
+            var notification = document.createElement('div');
+            notification.className = 'notification';
+            if (type === 'warning') notification.className += ' warning';
+            if (type === 'error') notification.className += ' error';
+            notification.textContent = message;
             
-            // Actualizar timestamp
-            const ahora = new Date();
-            document.getElementById('ultima-actualizacion').textContent = `${ahora.getHours()}:${ahora.getMinutes().toString().padStart(2, '0')}`;
+            document.body.appendChild(notification);
+            
+            setTimeout(function() {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(function() {
+                notification.classList.remove('show');
+                setTimeout(function() {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
         }
-        
-        // Actualizar cada 10 segundos
-        setInterval(actualizarDatos, 10000);
-        
-        // Función para simular escaneo de QR
-        function simularEscaneoQR() {
-            // En la implementación real, esto sería un QR que lleva a una URL única del comercio
-            const urlDonacion = window.location.href.replace('tablet', 'donacion') + '?comercio=panaderia-san-juan-001';
+
+        // Actualizar interfaz
+        function updateInterface() {
+            document.getElementById('canastas-disponibles').textContent = tabletState.canastasDisponibles;
+            document.getElementById('personas-ayudadas').textContent = tabletState.personasAyudadas;
+            document.getElementById('total-ayudadas').textContent = tabletState.totalAyudadas;
+            document.getElementById('contenido-canasta').textContent = tabletState.comercio.canasta;
             
-            // Simular apertura en móvil (nueva ventana para demo)
-            const ventanaDonacion = window.open('', 'donacion', 'width=400,height=800,scrollbars=yes');
+            // Actualizar tiempo
+            var now = new Date();
+            var diff = Math.floor((now - tabletState.lastUpdate) / 1000);
+            var timeText = diff < 60 ? 'Hace ' + diff + ' segundos' : 'Hace ' + Math.floor(diff / 60) + ' minutos';
+            document.getElementById('update-time').textContent = timeText;
+        }
+
+        // Actualizar estado de conexión
+        function updateConnectionStatus() {
+            var indicator = document.getElementById('status-indicator');
+            var text = document.getElementById('connection-text');
+            var offlineAlert = document.getElementById('offline-alert');
             
-            if (ventanaDonacion) {
-                alert('📱 Simulando escaneo de QR...\n\nEn la vida real, esto abriría la página de donación en el móvil del usuario.\n\nPor ahora, te voy a mostrar cómo se vería la página de donación.');
-                
-                // Aquí iría la redirección a la página de donación
-                // En la implementación real sería algo como:
-                // window.open(`https://donatucomida.com/donar/${comercioId}`, '_blank');
+            if (tabletState.isOnline) {
+                indicator.className = 'status-indicator';
+                text.textContent = 'ONLINE - Sincronizado';
+                offlineAlert.classList.remove('show');
+            } else {
+                indicator.className = 'status-indicator offline';
+                text.textContent = 'OFFLINE - Sin conexión';
+                offlineAlert.classList.add('show');
             }
         }
 
-        // Escuchar mensajes de la ventana de donación
-        window.addEventListener('message', function(event) {
-            if (event.data.tipo === 'nueva_donacion') {
-                // Actualizar tablet cuando llega una donación
-                const canastasNuevas = event.data.canastas;
-                canastasDisponibles += canastasNuevas;
+        // Simular escaneo de QR
+        function simularEscaneoQR() {
+            showNotification('📱 QR escaneado - Simulando apertura de página de donación');
+            
+            setTimeout(function() {
+                if (confirm('¿Abrir página de donación?\n\ndonatucomida.com/donar/' + tabletState.comercio.id)) {
+                    window.open('donar.html', '_blank', 'width=400,height=700');
+                }
+            }, 1000);
+        }
+
+        // Simular nueva donación
+        function simularDonacion() {
+            if (!tabletState.isOnline) {
+                showNotification('❌ Sin conexión - No se pueden procesar donaciones', 'error');
+                return;
+            }
+            
+            showNotification('💰 Simulando nueva donación...');
+            
+            setTimeout(function() {
+                var montos = [720, 1440, 2160]; // 1, 2, 3 canastas
+                var monto = montos[Math.floor(Math.random() * montos.length)];
+                var canastasNuevas = Math.floor(monto / 720);
                 
-                document.getElementById('canastas-disponibles').textContent = canastasDisponibles;
-                document.getElementById('canastas-disponibles').classList.add('updating');
+                tabletState.canastasDisponibles += canastasNuevas;
+                tabletState.lastUpdate = new Date();
                 
-                setTimeout(() => {
-                    document.getElementById('canastas-disponibles').classList.remove('updating');
-                }, 3000);
+                // Animar actualización
+                var element = document.getElementById('canastas-disponibles');
+                element.classList.add('updating');
+                setTimeout(function() {
+                    element.classList.remove('updating');
+                }, 1000);
                 
-                // Mostrar notificación en tablet
-                mostrarNotificacionDonacion(event.data.monto, canastasNuevas);
+                updateInterface();
+                showNotification('🎉 Nueva donación de  + monto + ' recibida (+' + canastasNuevas + ' canasta' + (canastasNuevas > 1 ? 's' : '') + ')');
+            }, 1500);
+        }
+
+        // Simular entrega
+        function simularEntrega() {
+            if (tabletState.canastasDisponibles === 0) {
+                showNotification('❌ No hay canastas disponibles para entregar', 'error');
+                return;
+            }
+            
+            showNotification('📦 Simulando entrega de canasta...');
+            
+            setTimeout(function() {
+                tabletState.canastasDisponibles--;
+                tabletState.personasAyudadas++;
+                tabletState.totalAyudadas++;
+                tabletState.lastUpdate = new Date();
+                
+                updateInterface();
+                showNotification('✅ Canasta entregada exitosamente');
+                
+                // Simular notificación al donante
+                setTimeout(function() {
+                    showNotification('📱 Donante notificado automáticamente');
+                }, 2000);
+            }, 1500);
+        }
+
+        // Toggle modo offline
+        function toggleOffline() {
+            tabletState.isOnline = !tabletState.isOnline;
+            updateConnectionStatus();
+            
+            if (tabletState.isOnline) {
+                showNotification('📶 Conexión restaurada');
+                // Simular sincronización
+                setTimeout(function() {
+                    showNotification('🔄 Datos sincronizados con servidor');
+                    tabletState.lastUpdate = new Date();
+                    updateInterface();
+                }, 1000);
+            } else {
+                showNotification('📴 Modo offline activado', 'warning');
+            }
+        }
+
+        // Ir al panel del comercio
+        function irAPanel() {
+            if (confirm('¿Ir al panel de gestión del comercio?')) {
+                window.open('comerciante.html', '_blank');
+            }
+        }
+
+        // Actualización automática en tiempo real
+        function startRealTimeUpdates() {
+            setInterval(function() {
+                if (tabletState.isOnline) {
+                    // Simular ping al servidor
+                    tabletState.lastUpdate = new Date();
+                    updateInterface();
+                    
+                    // Ocasionalmente simular actividad
+                    if (Math.random() < 0.1) { // 10% chance cada 10 segundos
+                        var eventos = [
+                            function() {
+                                showNotification('🔄 Sincronización automática completada');
+                            },
+                            function() {
+                                if (Math.random() < 0.5) {
+                                    simularDonacion();
+                                }
+                            },
+                            function() {
+                                showNotification('📡 Conexión verificada con servidor central');
+                            }
+                        ];
+                        
+                        var evento = eventos[Math.floor(Math.random() * eventos.length)];
+                        evento();
+                    }
+                }
+            }, 10000); // Cada 10 segundos
+        }
+
+        // Cargar datos desde URL (simular token de autenticación)
+        function loadDataFromUrl() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var token = urlParams.get('token');
+            var comercioId = urlParams.get('comercio');
+            
+            if (token && comercioId) {
+                showNotification('🔐 Autenticado con token: ' + token);
+                tabletState.comercio.id = comercioId;
+                
+                // En implementación real, cargaría datos específicos del comercio
+                console.log('Cargando datos para comercio:', comercioId, 'con token:', token);
+            }
+        }
+
+        // Funciones para PWA (Progressive Web App)
+        function setupPWA() {
+            // Registrar Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('🔧 Service Worker registrado');
+                    })
+                    .catch(function(error) {
+                        console.log('❌ Error registrando Service Worker:', error);
+                    });
+            }
+            
+            // Detectar cuando se añade a pantalla de inicio
+            window.addEventListener('beforeinstallprompt', function(e) {
+                console.log('📱 PWA lista para instalar');
+                showNotification('💡 Podés instalar esta tablet como app', 'warning');
+            });
+        }
+
+        // Simular diferentes estados del comercio
+        function changeComercioStatus() {
+            var estados = [
+                {
+                    canastas: 0,
+                    mensaje: '🔴 Sin canastas disponibles',
+                    contenido: 'Esperando donaciones...'
+                },
+                {
+                    canastas: 1,
+                    mensaje: '🟡 Pocas canastas disponibles',
+                    contenido: 'Pan + Facturas + Medialunas + Prepizzas'
+                },
+                {
+                    canastas: 5,
+                    mensaje: '🟢 Muchas canastas disponibles',
+                    contenido: 'Pan + Facturas + Medialunas + Prepizzas'
+                }
+            ];
+            
+            return estados[Math.floor(Math.random() * estados.length)];
+        }
+
+        // Simular notificaciones del sistema
+        function startSystemNotifications() {
+            var notificaciones = [
+                '🔔 Sistema supervisado por administrador',
+                '📊 Estadísticas actualizadas automáticamente',
+                '🛡️ Validación de entregas con IA activa',
+                '⚡ Base de datos sincronizada',
+                '🔍 Monitoreo anti-fraude funcionando'
+            ];
+            
+            setInterval(function() {
+                if (Math.random() < 0.05) { // 5% chance cada 30 segundos
+                    var notif = notificaciones[Math.floor(Math.random() * notificaciones.length)];
+                    showNotification(notif, 'warning');
+                }
+            }, 30000);
+        }
+
+        // Funcionalidades adicionales
+        function showTabletInfo() {
+            var info = '📱 INFORMACIÓN DE TABLET\n\n' +
+                      '🏪 Comercio: ' + tabletState.comercio.nombre + '\n' +
+                      '📍 Dirección: ' + tabletState.comercio.direccion + '\n' +
+                      '🆔 ID: ' + tabletState.comercio.id + '\n' +
+                      '💰 Precio canasta:  + tabletState.comercio.precio + '\n' +
+                      '🛒 Contenido: ' + tabletState.comercio.canasta + '\n\n' +
+                      '📊 ESTADÍSTICAS:\n' +
+                      '• Canastas disponibles: ' + tabletState.canastasDisponibles + '\n' +
+                      '• Personas ayudadas esta semana: ' + tabletState.personasAyudadas + '\n' +
+                      '• Total personas ayudadas: ' + tabletState.totalAyudadas + '\n\n' +
+                      '🔧 SISTEMA:\n' +
+                      '• Estado: ' + (tabletState.isOnline ? 'ONLINE' : 'OFFLINE') + '\n' +
+                      '• Última actualización: ' + tabletState.lastUpdate.toLocaleTimeString() + '\n' +
+                      '• Auto-sync: Cada 10 segundos\n' +
+                      '• PWA: Funciona offline';
+            
+            alert(info);
+        }
+
+        // Manejo de eventos de teclado para demo
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'd':
+                        e.preventDefault();
+                        simularDonacion();
+                        break;
+                    case 'e':
+                        e.preventDefault();
+                        simularEntrega();
+                        break;
+                    case 'o':
+                        e.preventDefault();
+                        toggleOffline();
+                        break;
+                    case 'i':
+                        e.preventDefault();
+                        showTabletInfo();
+                        break;
+                }
             }
         });
 
-        function mostrarNotificacionDonacion(monto, canastas) {
-            // Crear notificación temporal en la tablet
-            const notificacion = document.createElement('div');
-            notificacion.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #16a34a;
-                color: white;
-                padding: 15px 20px;
-                border-radius: 10px;
-                font-weight: bold;
-                z-index: 1000;
-                animation: slideIn 0.5s ease;
-            `;
-            notificacion.innerHTML = `🎉 ¡Nueva donación de ${monto}!<br>+${canastas} canasta${canastas !== 1 ? 's' : ''}`;
+        // Detectar cambios de conectividad real
+        window.addEventListener('online', function() {
+            if (!tabletState.isOnline) {
+                tabletState.isOnline = true;
+                updateConnectionStatus();
+                showNotification('📶 Conexión a internet restaurada');
+            }
+        });
+
+        window.addEventListener('offline', function() {
+            if (tabletState.isOnline) {
+                tabletState.isOnline = false;
+                updateConnectionStatus();
+                showNotification('📴 Se perdió la conexión a internet', 'error');
+            }
+        });
+
+        // Escuchar mensajes de otras ventanas (donaciones, panel comercio)
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'nueva_donacion') {
+                tabletState.canastasDisponibles += event.data.canastas;
+                tabletState.lastUpdate = new Date();
+                updateInterface();
+                showNotification('🎉 Nueva donación recibida desde página web');
+            } else if (event.data.type === 'entrega_realizada') {
+                if (tabletState.canastasDisponibles > 0) {
+                    tabletState.canastasDisponibles--;
+                    tabletState.personasAyudadas++;
+                    tabletState.totalAyudadas++;
+                    tabletState.lastUpdate = new Date();
+                    updateInterface();
+                    showNotification('📦 Entrega registrada desde panel comercio');
+                }
+            }
+        });
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📱 Tablet cargada para comercio:', tabletState.comercio.id);
             
-            document.body.appendChild(notificacion);
+            // Cargar datos desde URL
+            loadDataFromUrl();
             
-            setTimeout(() => {
-                notificacion.remove();
-            }, 4000);
+            // Configurar PWA
+            setupPWA();
+            
+            // Inicializar interfaz
+            updateInterface();
+            updateConnectionStatus();
+            
+            // Iniciar actualizaciones automáticas
+            startRealTimeUpdates();
+            startSystemNotifications();
+            
+            // Mostrar notificación inicial
+            setTimeout(function() {
+                showNotification('📱 Tablet inicializada correctamente');
+                showNotification('💡 Usá Ctrl+D (donar), Ctrl+E (entregar), Ctrl+O (offline)', 'warning');
+            }, 1000);
+        });
+
+        // Función para QR real (en implementación)
+        function generateQRCode() {
+            // En implementación real usaría una librería como QRCode.js
+            var qrData = {
+                url: 'https://donatucomida.com/donar/' + tabletState.comercio.id,
+                comercio: tabletState.comercio.nombre,
+                canasta: tabletState.comercio.canasta,
+                precio: tabletState.comercio.precio
+            };
+            
+            console.log('📱 QR generado con datos:', qrData);
+            return qrData;
         }
+
+        // Función para actualizar datos desde servidor real
+        function fetchFromServer() {
+            // En implementación real haría fetch a la API
+            return new Promise(function(resolve) {
+                setTimeout(function() {
+                    resolve({
+                        canastas: tabletState.canastasDisponibles,
+                        ayudadas: tabletState.personasAyudadas,
+                        total: tabletState.totalAyudadas,
+                        timestamp: new Date().toISOString()
+                    });
+                }, 1000);
+            });
+        }
+    </script>
 </body>
 </html>

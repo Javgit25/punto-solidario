@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Donar - Panadería San Juan</title>
+    <meta name="theme-color" content="#2563eb">
     <style>
         * {
             margin: 0;
@@ -258,29 +259,6 @@
             box-shadow: none;
         }
 
-        .demo-controls {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 15px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .demo-btn {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 8px 16px;
-            border-radius: 20px;
-            margin: 5px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        .demo-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
         .offline-mode {
             background: #fef3c7;
             border: 1px solid #f59e0b;
@@ -288,6 +266,11 @@
             border-radius: 12px;
             margin-bottom: 20px;
             text-align: center;
+            display: none;
+        }
+
+        .offline-mode.show {
+            display: block;
         }
 
         .offline-mode h4 {
@@ -320,6 +303,10 @@
 
         .notification.error {
             background: #dc2626;
+        }
+
+        .notification.warning {
+            background: #f59e0b;
         }
 
         .loading {
@@ -362,20 +349,71 @@
             color: #16a34a;
             margin-bottom: 15px;
         }
+
+        .demo-controls {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: 12px;
+        }
+
+        .demo-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .demo-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .amounts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
     <!-- Demo Controls -->
     <div class="demo-controls">
         <div style="font-size: 14px; font-weight: bold; margin-bottom: 10px;">
-            🎮 Demo: Tablet Offline/Online
+            🎮 Demo: Donación Móvil
         </div>
-        <button class="demo-btn" onclick="simularOffline()">📴 Simular Sin Internet</button>
-        <button class="demo-btn" onclick="simularOnline()">📶 Restaurar Conexión</button>
+        <button class="demo-btn" onclick="simularOffline()">📴 Sin Internet</button>
+        <button class="demo-btn" onclick="simularOnline()">📶 Con Internet</button>
         <button class="demo-btn" onclick="resetearDemo()">🔄 Resetear</button>
+        <button class="demo-btn" onclick="irASeguimiento()">🔍 Ver Seguimiento</button>
     </div>
 
     <div class="container">
+        <a href="index.html" class="back-btn">← Volver</a>
+        
         <!-- Header -->
         <div class="header">
             <div class="logo">🍞 Doná Tu Comida</div>
@@ -383,21 +421,21 @@
         </div>
 
         <!-- Modo Offline Alert -->
-        <div class="offline-mode" id="offline-alert" style="display: none;">
+        <div class="offline-mode" id="offline-alert">
             <h4>📴 Sin Conexión a Internet</h4>
             <p>No podés donar ahora. Intentá más tarde cuando tengas conexión.</p>
         </div>
 
         <!-- Información del comercio -->
         <div class="comercio-info">
-            <div class="comercio-name">Panadería San Juan</div>
-            <div class="comercio-address">📍 Av. San Juan 1234, Barracas</div>
+            <div class="comercio-name" id="comercio-name">Panadería San Juan</div>
+            <div class="comercio-address" id="comercio-address">📍 Av. San Juan 1234, Barracas</div>
             
             <div class="canasta-info">
                 <div class="canasta-title">
                     🛒 Canasta Solidaria ($720)
                 </div>
-                <div class="canasta-content">
+                <div class="canasta-content" id="canasta-content">
                     Pan lactal + 6 facturas + 4 medialunas + 2 prepizzas
                 </div>
             </div>
@@ -419,7 +457,6 @@
                         placeholder="0"
                         min="100"
                         step="50"
-                        onInput="actualizarMontoPersonalizado()"
                     >
                 </div>
             </div>
@@ -428,20 +465,20 @@
             <div class="quick-amounts">
                 <div class="quick-title">O elegí un monto rápido:</div>
                 <div class="amounts-grid">
-                    <div class="amount-btn" data-amount="800" onclick="seleccionarMontoRapido(800)">
-                        <div class="amount-value">$800</div>
+                    <div class="amount-btn" data-amount="720" onclick="seleccionarMontoRapido(720)">
+                        <div class="amount-value">$720</div>
                         <div class="amount-canastas">1 canasta</div>
                     </div>
-                    <div class="amount-btn" data-amount="1600" onclick="seleccionarMontoRapido(1600)">
-                        <div class="amount-value">$1.600</div>
+                    <div class="amount-btn" data-amount="1440" onclick="seleccionarMontoRapido(1440)">
+                        <div class="amount-value">$1.440</div>
                         <div class="amount-canastas">2 canastas</div>
                     </div>
-                    <div class="amount-btn" data-amount="2400" onclick="seleccionarMontoRapido(2400)">
-                        <div class="amount-value">$2.400</div>
+                    <div class="amount-btn" data-amount="2160" onclick="seleccionarMontoRapido(2160)">
+                        <div class="amount-value">$2.160</div>
                         <div class="amount-canastas">3 canastas</div>
                     </div>
-                    <div class="amount-btn" data-amount="4000" onclick="seleccionarMontoRapido(4000)">
-                        <div class="amount-value">$4.000</div>
+                    <div class="amount-btn" data-amount="3600" onclick="seleccionarMontoRapido(3600)">
+                        <div class="amount-value">$3.600</div>
                         <div class="amount-canastas">5 canastas</div>
                     </div>
                 </div>
@@ -473,7 +510,7 @@
         <!-- Loading -->
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            <div>Procesando tu donación...</div>
+            <div id="loading-text">Procesando tu donación...</div>
         </div>
 
         <!-- Success -->
@@ -483,191 +520,289 @@
             <div style="color: #64748b; margin-bottom: 20px;" id="success-message">
                 Tu donación ya está disponible para ayudar
             </div>
-            <button style="background: #2563eb; color: white; border: none; padding: 12px 24px; border-radius: 8px;" onclick="verSeguimiento()">
+            <button style="background: #2563eb; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer;" onclick="verSeguimiento()">
                 Ver Seguimiento
             </button>
         </div>
     </div>
 
     <script>
-        let montoSeleccionado = 0;
-        let isOffline = false;
+        // Estado de la donación
+        var donationState = {
+            montoSeleccionado: 0,
+            isOffline: false,
+            comercio: {
+                id: 'PSJ-001',
+                nombre: 'Panadería San Juan',
+                direccion: 'Av. San Juan 1234, Barracas',
+                canasta: 'Pan lactal + 6 facturas + 4 medialunas + 2 prepizzas',
+                precio: 720
+            },
+            donacionActual: null
+        };
 
+        // Función para mostrar notificaciones
+        function showNotification(message, type) {
+            var notification = document.createElement('div');
+            notification.className = 'notification';
+            if (type === 'warning') notification.className += ' warning';
+            if (type === 'error') notification.className += ' error';
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(function() {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(function() {
+                notification.classList.remove('show');
+                setTimeout(function() {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 4000);
+        }
+
+        // Actualizar monto personalizado
         function actualizarMontoPersonalizado() {
-            const input = document.getElementById('main-amount-input');
-            const monto = parseInt(input.value) || 0;
+            var input = document.getElementById('main-amount-input');
+            var monto = parseInt(input.value) || 0;
             
             // Quitar selección de botones rápidos
-            document.querySelectorAll('.amount-btn').forEach(btn => {
-                btn.classList.remove('selected');
-            });
+            var buttons = document.querySelectorAll('.amount-btn');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove('selected');
+            }
             
-            montoSeleccionado = monto;
+            donationState.montoSeleccionado = monto;
             actualizarEquivalencia();
             habilitarBoton();
         }
 
+        // Seleccionar monto rápido
         function seleccionarMontoRapido(monto) {
             // Actualizar input principal
             document.getElementById('main-amount-input').value = monto;
             
             // Quitar selección anterior
-            document.querySelectorAll('.amount-btn').forEach(btn => {
-                btn.classList.remove('selected');
-            });
+            var buttons = document.querySelectorAll('.amount-btn');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove('selected');
+            }
             
             // Seleccionar actual
-            document.querySelector(`[data-amount="${monto}"]`).classList.add('selected');
+            event.target.closest('.amount-btn').classList.add('selected');
             
-            montoSeleccionado = monto;
+            donationState.montoSeleccionado = monto;
             actualizarEquivalencia();
             habilitarBoton();
             
-            mostrarNotificacion(`💰 Monto seleccionado: $${monto.toLocaleString()}`);
+            showNotification('💰 Monto seleccionado:  + monto.toLocaleString());
         }
 
+        // Actualizar equivalencia
         function actualizarEquivalencia() {
-            const equivalenciaEl = document.getElementById('equivalencia');
+            var equivalenciaEl = document.getElementById('equivalencia');
+            var monto = donationState.montoSeleccionado;
+            var precioCanasta = donationState.comercio.precio;
             
-            if (montoSeleccionado >= 800) {
-                const canastas = Math.floor(montoSeleccionado / 800);
-                const restante = montoSeleccionado % 800;
+            if (monto >= precioCanasta) {
+                var canastas = Math.floor(monto / precioCanasta);
+                var restante = monto % precioCanasta;
                 
-                let texto = `🎯 Tu donación de $${montoSeleccionado.toLocaleString()} genera ${canastas} canasta${canastas > 1 ? 's' : ''}`;
+                var texto = '🎯 Tu donación de  + monto.toLocaleString() + ' genera ' + canastas + ' canasta' + (canastas > 1 ? 's' : '');
                 
                 if (restante > 0) {
-                    texto += ` + $${restante} que se acumula para futuras canastas`;
+                    texto += ' +  + restante + ' que se acumula para futuras canastas';
                 }
                 
                 equivalenciaEl.textContent = texto;
-            } else if (montoSeleccionado > 0) {
-                const faltante = 800 - montoSeleccionado;
-                equivalenciaEl.textContent = `💛 Tu donación de $${montoSeleccionado.toLocaleString()} se acumula. Faltan $${faltante} para completar 1 canasta`;
+            } else if (monto > 0) {
+                var faltante = precioCanasta - monto;
+                equivalenciaEl.textContent = '💛 Tu donación de  + monto.toLocaleString() + ' se acumula. Faltan  + faltante + ' para completar 1 canasta';
             } else {
                 equivalenciaEl.textContent = 'Ingresá un monto para ver cuántas canastas generás';
             }
         }
 
+        // Habilitar botón
         function habilitarBoton() {
-            const btn = document.getElementById('donate-btn');
+            var btn = document.getElementById('donate-btn');
+            var monto = donationState.montoSeleccionado;
             
-            if (isOffline) {
+            if (donationState.isOffline) {
                 btn.disabled = true;
                 btn.textContent = '📴 Sin conexión - No se puede donar';
                 return;
             }
             
-            if (montoSeleccionado >= 100) {
+            if (monto >= 100) {
                 btn.disabled = false;
-                btn.textContent = `Donar $${montoSeleccionado.toLocaleString()} con MercadoPago`;
-            } else if (montoSeleccionado > 0) {
+                btn.textContent = 'Donar  + monto.toLocaleString() + ' con MercadoPago';
+            } else if (monto > 0) {
                 btn.disabled = true;
-                btn.textContent = `Monto mínimo: $100`;
+                btn.textContent = 'Monto mínimo: $100';
             } else {
                 btn.disabled = true;
                 btn.textContent = 'Seleccioná un monto para continuar';
             }
         }
 
+        // Procesar donación
         function procesarDonacion() {
-            if (isOffline) {
-                mostrarNotificacion('❌ No hay conexión a internet', 'error');
+            if (donationState.isOffline) {
+                showNotification('❌ No hay conexión a internet', 'error');
                 return;
             }
             
-            if (montoSeleccionado < 100) {
-                mostrarNotificacion('❌ El monto mínimo es $100', 'error');
+            if (donationState.montoSeleccionado < 100) {
+                showNotification('❌ El monto mínimo es $100', 'error');
                 return;
             }
 
             // Ocultar formulario y mostrar loading
             document.getElementById('donation-form').style.display = 'none';
             document.getElementById('loading').classList.add('show');
+            document.getElementById('loading-text').textContent = 'Redirigiendo a MercadoPago...';
 
-            mostrarNotificacion('💳 Redirigiendo a MercadoPago...');
+            showNotification('💳 Redirigiendo a MercadoPago...');
 
-            // Simular procesamiento
-            setTimeout(() => {
-                completarDonacion();
-            }, 3000);
+            // Simular redirección a MercadoPago
+            setTimeout(function() {
+                document.getElementById('loading-text').textContent = 'Procesando pago en MercadoPago...';
+                showNotification('💳 Procesando pago...', 'warning');
+                
+                // Simular tiempo de procesamiento
+                setTimeout(function() {
+                    completarDonacion();
+                }, 3000);
+            }, 2000);
         }
 
+        // Completar donación
         function completarDonacion() {
-            const canastas = Math.floor(montoSeleccionado / 800);
+            var canastas = Math.floor(donationState.montoSeleccionado / donationState.comercio.precio);
+            var donacionId = 'DTC-2025-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+            
+            donationState.donacionActual = {
+                id: donacionId,
+                monto: donationState.montoSeleccionado,
+                canastas: canastas,
+                comercio: donationState.comercio,
+                fecha: new Date(),
+                estado: 'confirmada'
+            };
             
             // Mostrar éxito
             document.getElementById('loading').classList.remove('show');
             document.getElementById('success').classList.add('show');
 
-            const mensaje = canastas > 0 
-                ? `Tu donación generó ${canastas} canasta${canastas > 1 ? 's' : ''} solidaria${canastas > 1 ? 's' : ''}`
-                : `Tu donación de $${montoSeleccionado.toLocaleString()} se acumuló para futuras canastas`;
+            var mensaje = canastas > 0 
+                ? 'Tu donación generó ' + canastas + ' canasta' + (canastas > 1 ? 's' : '') + ' solidaria' + (canastas > 1 ? 's' : '')
+                : 'Tu donación de  + donationState.montoSeleccionado.toLocaleString() + ' se acumuló para futuras canastas';
             
             document.getElementById('success-message').textContent = mensaje;
 
-            mostrarNotificacion('✅ ¡Donación procesada exitosamente!');
+            showNotification('✅ ¡Donación procesada exitosamente!');
+            
+            // Notificar a tablet si está abierta
+            notificarTablet();
+            
+            // Auto-redirect a seguimiento después de 5 segundos
+            setTimeout(function() {
+                if (confirm('¿Querés ver el seguimiento de tu donación?')) {
+                    verSeguimiento();
+                }
+            }, 5000);
         }
 
+        // Ver seguimiento
         function verSeguimiento() {
-            const donacionId = 'DTC-2025-' + Math.random().toString(36).substr(2, 6).toUpperCase();
-            mostrarNotificacion(`🔍 Redirigiendo a seguimiento: ${donacionId}`);
+            if (!donationState.donacionActual) {
+                showNotification('❌ No hay donación activa para hacer seguimiento', 'error');
+                return;
+            }
             
-            setTimeout(() => {
-                alert(`🔍 SEGUIMIENTO DE DONACIÓN
-
-ID: ${donacionId}
-Monto: $${montoSeleccionado.toLocaleString()}
-URL: donatucomida.com/seguimiento/${donacionId}
-
-En la implementación real:
-• Se abre página de seguimiento
-• Timeline transparente completo
-• Notificaciones automáticas por WhatsApp
-• Updates en tiempo real`);
+            var donacionId = donationState.donacionActual.id;
+            showNotification('🔍 Redirigiendo a seguimiento: ' + donacionId);
+            
+            setTimeout(function() {
+                if (confirm('¿Abrir página de seguimiento?\n\nID: ' + donacionId)) {
+                    // En implementación real redirigiría a seguimiento.html?id=donacionId
+                    window.open('seguimiento.html?id=' + donacionId, '_blank');
+                }
             }, 500);
+        }
+
+        // Ir a seguimiento desde demo
+        function irASeguimiento() {
+            window.open('seguimiento.html', '_blank');
+        }
+
+        // Notificar a tablet
+        function notificarTablet() {
+            if (window.opener) {
+                window.opener.postMessage({
+                    type: 'nueva_donacion',
+                    canastas: donationState.donacionActual.canastas,
+                    monto: donationState.donacionActual.monto,
+                    donacionId: donationState.donacionActual.id
+                }, '*');
+            }
         }
 
         // Funciones de demo offline/online
         function simularOffline() {
-            isOffline = true;
-            document.getElementById('offline-alert').style.display = 'block';
+            donationState.isOffline = true;
+            document.getElementById('offline-alert').classList.add('show');
             
             // Deshabilitar input y botones
             document.getElementById('main-amount-input').disabled = true;
-            document.querySelectorAll('.amount-btn').forEach(btn => {
-                btn.style.opacity = '0.5';
-                btn.style.cursor = 'not-allowed';
-                btn.onclick = null;
-            });
+            var buttons = document.querySelectorAll('.amount-btn');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].style.opacity = '0.5';
+                buttons[i].style.cursor = 'not-allowed';
+                buttons[i].onclick = null;
+            }
             
             habilitarBoton();
-            mostrarNotificacion('📴 Modo offline activado - No se puede donar', 'error');
+            showNotification('📴 Modo offline activado - No se puede donar', 'error');
         }
 
         function simularOnline() {
-            isOffline = false;
-            document.getElementById('offline-alert').style.display = 'none';
+            donationState.isOffline = false;
+            document.getElementById('offline-alert').classList.remove('show');
             
             // Rehabilitar input y botones
             document.getElementById('main-amount-input').disabled = false;
-            document.querySelectorAll('.amount-btn').forEach((btn, index) => {
-                btn.style.opacity = '1';
-                btn.style.cursor = 'pointer';
-                const montos = [800, 1600, 2400, 4000];
-                btn.onclick = () => seleccionarMontoRapido(montos[index]);
-            });
+            var buttons = document.querySelectorAll('.amount-btn');
+            var montos = [720, 1440, 2160, 3600];
+            
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].style.opacity = '1';
+                buttons[i].style.cursor = 'pointer';
+                (function(index) {
+                    buttons[index].onclick = function() {
+                        seleccionarMontoRapido(montos[index]);
+                    };
+                })(i);
+            }
             
             habilitarBoton();
-            mostrarNotificacion('📶 Conexión restaurada - Ya podés donar');
+            showNotification('📶 Conexión restaurada - Ya podés donar');
         }
 
         function resetearDemo() {
             document.getElementById('main-amount-input').value = '';
-            document.querySelectorAll('.amount-btn').forEach(btn => {
-                btn.classList.remove('selected');
-            });
+            var buttons = document.querySelectorAll('.amount-btn');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove('selected');
+            }
             
-            montoSeleccionado = 0;
+            donationState.montoSeleccionado = 0;
+            donationState.donacionActual = null;
             actualizarEquivalencia();
             habilitarBoton();
             
@@ -677,57 +812,161 @@ En la implementación real:
             document.getElementById('success').classList.remove('show');
             
             simularOnline();
-            mostrarNotificacion('🔄 Demo reseteada');
+            showNotification('🔄 Demo reseteada');
         }
 
-        function mostrarNotificacion(mensaje, tipo = 'success') {
-            const notification = document.createElement('div');
-            notification.className = `notification ${tipo}`;
-            notification.textContent = mensaje;
+        // Cargar datos del comercio desde URL
+        function cargarDatosComercio() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var comercioId = urlParams.get('comercio') || 'PSJ-001';
             
-            document.body.appendChild(notification);
+            // En implementación real, haría fetch a la API
+            var comerciosData = {
+                'PSJ-001': {
+                    nombre: 'Panadería San Juan',
+                    direccion: 'Av. San Juan 1234, Barracas',
+                    canasta: 'Pan lactal + 6 facturas + 4 medialunas + 2 prepizzas',
+                    precio: 720
+                },
+                'VBS-002': {
+                    nombre: 'Verdulería El Buen Sabor',
+                    direccion: 'Defensa 567, San Telmo',
+                    canasta: 'Frutas de estación (2kg) + Verduras variadas (3kg)',
+                    precio: 720
+                }
+            };
             
-            setTimeout(() => notification.classList.add('show'), 100);
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => {
-                    if (document.body.contains(notification)) {
-                        document.body.removeChild(notification);
-                    }
-                }, 300);
-            }, 4000);
+            var comercioData = comerciosData[comercioId];
+            if (comercioData) {
+                donationState.comercio = Object.assign(donationState.comercio, comercioData);
+                donationState.comercio.id = comercioId;
+                
+                // Actualizar UI
+                document.getElementById('comercio-name').textContent = comercioData.nombre;
+                document.getElementById('comercio-address').textContent = '📍 ' + comercioData.direccion;
+                document.getElementById('canasta-content').textContent = comercioData.canasta;
+                
+                showNotification('🏪 Datos cargados para: ' + comercioData.nombre);
+            }
         }
 
-        // Inicialización
+        // Validar entrada de monto
+        function validarMonto(valor) {
+            // Solo números
+            valor = valor.replace(/[^0-9]/g, '');
+            
+            // Límite máximo (ejemplo: $100,000)
+            if (parseInt(valor) > 100000) {
+                valor = '100000';
+                showNotification('💡 Monto máximo: $100.000', 'warning');
+            }
+            
+            return valor;
+        }
+
+        // Detectar conectividad real
+        function detectarConectividad() {
+            if (!navigator.onLine) {
+                simularOffline();
+            }
+            
+            window.addEventListener('online', function() {
+                if (donationState.isOffline) {
+                    simularOnline();
+                }
+            });
+            
+            window.addEventListener('offline', function() {
+                if (!donationState.isOffline) {
+                    simularOffline();
+                }
+            });
+        }
+
+        // Integración con MercadoPago real
+        function integrarMercadoPago() {
+            // En implementación real:
+            return {
+                createPreference: function(data) {
+                    return fetch('/api/mercadopago/create-preference', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            items: [{
+                                title: 'Donación - ' + data.comercio.nombre,
+                                quantity: 1,
+                                unit_price: data.monto
+                            }],
+                            external_reference: data.donacionId,
+                            back_urls: {
+                                success: window.location.origin + '/seguimiento/' + data.donacionId,
+                                pending: window.location.origin + '/pago-pendiente',
+                                failure: window.location.origin + '/pago-fallido'
+                            }
+                        })
+                    });
+                }
+            };
+        }
+
+        // Event listeners
         document.addEventListener('DOMContentLoaded', function() {
-            // Focus en input principal
-            document.getElementById('main-amount-input').focus();
+            // Cargar datos del comercio
+            cargarDatosComercio();
             
-            setTimeout(() => {
-                mostrarNotificacion('💰 Ingresá el monto que querés donar');
+            // Detectar conectividad
+            detectarConectividad();
+            
+            // Focus en input principal
+            var mainInput = document.getElementById('main-amount-input');
+            mainInput.focus();
+            
+            // Event listener para input manual
+            mainInput.addEventListener('input', function(e) {
+                var valor = validarMonto(e.target.value);
+                e.target.value = valor;
+                actualizarMontoPersonalizado();
+            });
+            
+            // Enter para donar
+            mainInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !document.getElementById('donate-btn').disabled) {
+                    procesarDonacion();
+                }
+            });
+            
+            // Mensaje inicial
+            setTimeout(function() {
+                showNotification('💰 Ingresá el monto que querés donar');
             }, 1000);
         });
 
-        // Formateo automático del input
-        document.getElementById('main-amount-input').addEventListener('input', function(e) {
-            let value = e.target.value;
+        // Analytics y tracking (para implementación real)
+        function trackEvent(eventName, data) {
+            console.log('📊 Analytics:', eventName, data);
             
-            // Solo permitir números
-            value = value.replace(/[^0-9]/g, '');
-            
-            // Actualizar valor
-            e.target.value = value;
-            
-            actualizarMontoPersonalizado();
-        });
+            // En implementación real:
+            // gtag('event', eventName, data);
+            // fbq('track', eventName, data);
+        }
 
-        // Enter para donar
-        document.getElementById('main-amount-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && !document.getElementById('donate-btn').disabled) {
-                procesarDonacion();
-            }
-        });
+        // Llamar tracking en eventos importantes
+        function trackDonationStarted() {
+            trackEvent('donation_started', {
+                comercio_id: donationState.comercio.id,
+                monto: donationState.montoSeleccionado
+            });
+        }
+
+        function trackDonationCompleted() {
+            trackEvent('donation_completed', {
+                comercio_id: donationState.comercio.id,
+                monto: donationState.montoSeleccionado,
+                donacion_id: donationState.donacionActual.id
+            });
+        }
     </script>
 </body>
 </html>

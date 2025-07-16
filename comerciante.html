@@ -32,6 +32,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .logo {
@@ -49,6 +51,19 @@
             margin-bottom: 2px;
         }
 
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
         .nav-tabs {
             background: white;
             display: flex;
@@ -56,6 +71,8 @@
             position: sticky;
             top: 80px;
             z-index: 90;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .nav-tab {
@@ -82,6 +99,8 @@
             display: none;
             padding: 20px;
             min-height: calc(100vh - 140px);
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .tab-content.active {
@@ -90,7 +109,7 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-bottom: 25px;
         }
@@ -116,6 +135,10 @@
 
         .stat-number.entregadas {
             color: #16a34a;
+        }
+
+        .stat-number.dinero {
+            color: #2563eb;
         }
 
         .stat-label {
@@ -432,6 +455,12 @@
             font-size: 12px;
             color: #6b7280;
             cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .foto-mini:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
         .foto-mini.uploaded {
@@ -490,93 +519,85 @@
             transition: transform 0.3s ease;
         }
 
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.warning {
+            background: #f59e0b;
+        }
+
+        .notification.error {
+            background: #dc2626;
+        }
+
+        .file-input {
             display: none;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
         }
 
-        .modal.show {
-            display: flex;
-        }
-
-        .modal-content {
+        .config-section {
             background: white;
+            border-radius: 12px;
             padding: 25px;
-            border-radius: 16px;
-            max-width: 90%;
-            max-height: 90%;
-            text-align: center;
-            overflow-y: auto;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
-        .modal-content h3 {
+        .config-title {
+            font-size: 18px;
+            font-weight: bold;
             margin-bottom: 20px;
             color: #1e293b;
-            font-size: 18px;
         }
 
-        .modal-content img {
-            max-width: 100%;
-            max-height: 400px;
-            border-radius: 12px;
-            border: 2px solid #e2e8f0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .modal-content .btn-cancel {
-            margin-top: 20px;
-            background: #6b7280;
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
             color: white;
             border: none;
             padding: 12px 24px;
             border-radius: 8px;
             font-size: 14px;
+            font-weight: bold;
             cursor: pointer;
-            transition: background 0.3s ease;
+            transition: all 0.3s ease;
         }
 
-        .notification.show {
-            transform: translateX(0);
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
         }
 
-        /* Hidden file inputs */
-        .file-input {
-            display: none;
-        }
-
-        /* Estilos adicionales para mejor UX */
-        .foto-mini {
-            transition: all 0.2s ease;
-        }
-
-        .foto-mini:hover {
-            transform: scale(1.1);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-
-        .foto-mini:active {
-            transform: scale(0.95);
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-buttons {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
+    <a href="index.html" class="back-btn">← Volver</a>
+    
     <!-- Header -->
     <div class="header">
         <div class="header-content">
             <div class="logo">🍞 Doná Tu Comida</div>
             <div class="comercio-info">
                 <div class="comercio-name" id="comercio-name">Panadería San Juan</div>
-                <div id="comercio-direccion">Av. San Juan 1234</div>
+                <div id="comercio-direccion">Av. San Juan 1234, Barracas</div>
+                <div style="font-size: 12px; opacity: 0.8;">ID: PSJ-001 | Estado: ACTIVO</div>
             </div>
         </div>
     </div>
@@ -584,13 +605,16 @@
     <!-- Navigation Tabs -->
     <div class="nav-tabs">
         <button class="nav-tab active" onclick="cambiarTab('pendientes')">
-            📋 Pendientes
+            📋 Pendientes (<span id="count-pendientes">3</span>)
         </button>
         <button class="nav-tab" onclick="cambiarTab('historial')">
             📊 Historial
         </button>
         <button class="nav-tab" onclick="cambiarTab('configuracion')">
-            ⚙️ Config
+            ⚙️ Configuración
+        </button>
+        <button class="nav-tab" onclick="cambiarTab('estadisticas')">
+            📈 Estadísticas
         </button>
     </div>
 
@@ -605,6 +629,10 @@
             <div class="stat-card">
                 <div class="stat-number entregadas" id="canastas-entregadas-hoy">2</div>
                 <div class="stat-label">Entregadas Hoy</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number dinero" id="dinero-pendiente">$2.160</div>
+                <div class="stat-label">Dinero Pendiente</div>
             </div>
         </div>
 
@@ -670,6 +698,7 @@
                     <div class="historial-fecha">Hace 1 hora</div>
                 </div>
                 <div class="historial-persona">Entregado a: María González</div>
+                <div style="font-size: 12px; color: #64748b;">Método: DNI 12345678</div>
                 <div class="historial-fotos">
                     <div class="foto-mini uploaded" onclick="verFotoHistorial('ticket', 'DTC-004')">📄</div>
                     <div class="foto-mini uploaded" onclick="verFotoHistorial('productos', 'DTC-004')">📸</div>
@@ -683,6 +712,7 @@
                     <div class="historial-fecha">Hace 3 horas</div>
                 </div>
                 <div class="historial-persona">Entregado a: Carlos Mendez</div>
+                <div style="font-size: 12px; color: #64748b;">Método: Solo nombre</div>
                 <div class="historial-fotos">
                     <div class="foto-mini uploaded" onclick="verFotoHistorial('ticket', 'DTC-005')">📄</div>
                     <div class="foto-mini uploaded" onclick="verFotoHistorial('productos', 'DTC-005')">📸</div>
@@ -694,39 +724,96 @@
 
     <!-- Tab: Configuración -->
     <div class="tab-content" id="tab-configuracion">
-        <div class="section-title">Configuración de Canasta</div>
-        
-        <div class="canasta-card">
-            <div class="canasta-content">
-                <div class="form-group">
-                    <label class="form-label">Contenido de la canasta ($720)</label>
-                    <textarea class="form-input" rows="3" id="contenido-canasta">Pan lactal + 6 facturas + 4 medialunas + 2 prepizzas</textarea>
-                </div>
-                <button class="entregar-btn" onclick="actualizarCanasta()">
-                    💾 Guardar Cambios
-                </button>
+        <div class="config-section">
+            <div class="config-title">Configuración de Canasta</div>
+            
+            <div class="form-group">
+                <label class="form-label">Contenido de la canasta ($720)</label>
+                <textarea class="form-input" rows="3" id="contenido-canasta">Pan lactal + 6 facturas + 4 medialunas + 2 prepizzas</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Precio por canasta</label>
+                <input type="number" class="form-input" id="precio-canasta" value="720" min="100" step="10">
+            </div>
+            
+            <button class="btn-primary" onclick="actualizarCanasta()">
+                💾 Guardar Cambios
+            </button>
+            
+            <div style="margin-top: 15px; padding: 15px; background: #fef3c7; border-radius: 8px; font-size: 14px; color: #92400e;">
+                <strong>⚠️ Importante:</strong> Los cambios requieren validación del administrador y pueden tardar 24-48hs en aplicarse.
             </div>
         </div>
 
-        <div class="section-title" style="margin-top: 30px;">Estadísticas</div>
-        
+        <div class="config-section">
+            <div class="config-title">Enlaces del Sistema</div>
+            
+            <div class="form-group">
+                <label class="form-label">URL de tu tablet</label>
+                <input type="text" class="form-input" value="https://donatucomida.com/tablet/PSJ-001?token=abc123" readonly onclick="copiarTexto(this)">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">URL de donación (QR)</label>
+                <input type="text" class="form-input" value="https://donatucomida.com/donar/PSJ-001" readonly onclick="copiarTexto(this)">
+            </div>
+            
+            <button class="btn-primary" onclick="abrirTablet()">
+                📱 Abrir Tablet
+            </button>
+        </div>
+    </div>
+
+    <!-- Tab: Estadísticas -->
+    <div class="tab-content" id="tab-estadisticas">
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-number" style="color: #2563eb;">8</div>
+                <div class="stat-number dinero">$8.640</div>
+                <div class="stat-label">Total Recibido</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number entregadas">12</div>
+                <div class="stat-label">Canastas Entregadas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number pendientes">8</div>
                 <div class="stat-label">Personas Ayudadas</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" style="color: #7c3aed;">$5.760</div>
-                <div class="stat-label">Total Recibido</div>
+                <div class="stat-number dinero">$7.776</div>
+                <div class="stat-label">Ganancia Neta (90%)</div>
+            </div>
+        </div>
+
+        <div class="config-section">
+            <div class="config-title">Resumen Semanal</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                <div style="text-align: center; padding: 15px; background: #f0f9ff; border-radius: 8px;">
+                    <div style="font-size: 20px; font-weight: bold; color: #2563eb;">2</div>
+                    <div style="font-size: 12px; color: #64748b;">Lunes</div>
+                </div>
+                <div style="text-align: center; padding: 15px; background: #f0fdf4; border-radius: 8px;">
+                    <div style="font-size: 20px; font-weight: bold; color: #16a34a;">3</div>
+                    <div style="font-size: 12px; color: #64748b;">Martes</div>
+                </div>
+                <div style="text-align: center; padding: 15px; background: #fef3c7; border-radius: 8px;">
+                    <div style="font-size: 20px; font-weight: bold; color: #f59e0b;">1</div>
+                    <div style="font-size: 12px; color: #64748b;">Miércoles</div>
+                </div>
+                <div style="text-align: center; padding: 15px; background: #f0f9ff; border-radius: 8px;">
+                    <div style="font-size: 20px; font-weight: bold; color: #2563eb;">2</div>
+                    <div style="font-size: 12px; color: #64748b;">Hoy</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Formulario de Entrega (Modal) -->
+    <!-- Modal para registro de entrega -->
     <div class="entrega-form" id="entrega-form">
         <div class="form-container">
             <div class="form-header">
-                <div class="form-title">Registrar Entrega</div>
+                <div class="form-title">📦 Registrar Entrega</div>
                 <div id="canasta-info">Canasta #DTC-001 • $720</div>
             </div>
             
@@ -750,7 +837,7 @@
 
                 <!-- Datos de la persona -->
                 <div class="form-group">
-                    <label class="form-label">Nombre de quien recibe</label>
+                    <label class="form-label">Nombre de quien recibe *</label>
                     <input type="text" class="form-input" id="nombre-persona" placeholder="Nombre y apellido">
                 </div>
 
@@ -767,466 +854,6 @@
                 <!-- Foto del ticket -->
                 <div class="form-group">
                     <label class="form-label">Foto del ticket/recibo *</label>
-                    <div class="photo-upload" onclick="seleccionarFoto('ticket')">
+                    <div class="photo-upload" id="upload-ticket" onclick="seleccionarFoto('ticket')">
                         <div class="upload-icon">📄</div>
-                        <div class="upload-text">Tocá para subir foto del ticket<br><small>(En móvil se abre la cámara)</small></div>
-                        <img class="photo-preview" id="preview-ticket" alt="Ticket">
-                    </div>
-                    <input type="file" id="input-ticket" class="file-input" accept="image/*" capture="environment">
-                </div>
-
-                <!-- Foto de productos -->
-                <div class="form-group">
-                    <label class="form-label">Foto de productos entregados *</label>
-                    <div class="photo-upload" onclick="seleccionarFoto('productos')">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Tocá para subir foto de productos<br><small>(En móvil se abre la cámara)</small></div>
-                        <img class="photo-preview" id="preview-productos" alt="Productos">
-                    </div>
-                    <input type="file" id="input-productos" class="file-input" accept="image/*" capture="environment">
-                </div>
-
-                <!-- Foto de la persona (opcional) -->
-                <div class="form-group">
-                    <label class="form-label">Foto de la entrega (opcional)</label>
-                    <div class="photo-upload" onclick="seleccionarFoto('persona')">
-                        <div class="upload-icon">👤</div>
-                        <div class="upload-text">Tocá para subir foto de la entrega<br><small>(En móvil se abre la cámara)</small></div>
-                        <img class="photo-preview" id="preview-persona" alt="Persona">
-                    </div>
-                    <input type="file" id="input-persona" class="file-input" accept="image/*" capture="environment">
-                </div>
-
-                <!-- Botones -->
-                <div class="form-buttons">
-                    <button class="btn-cancel" onclick="cerrarFormularioEntrega()">Cancelar</button>
-                    <button class="btn-submit" id="btn-confirmar" onclick="confirmarEntrega()" disabled>
-                        Confirmar Entrega
-                    </button>
-                </div>
-
-                <!-- Loading -->
-                <div class="loading" id="form-loading">
-                    <div class="spinner"></div>
-                    <div>Validando entrega...</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Variables globales
-        let canastas = [
-            { id: 'DTC-001', monto: 720, tiempo: 'Hace 2 horas', productos: 'Pan lactal + 6 facturas + 4 medialunas + 2 prepizzas' },
-            { id: 'DTC-002', monto: 720, tiempo: 'Hace 4 horas', productos: 'Pan lactal + 6 facturas + 4 medialunas + 2 prepizzas' },
-            { id: 'DTC-003', monto: 720, tiempo: 'Hace 6 horas', productos: 'Pan lactal + 6 facturas + 4 medialunas + 2 prepizzas' }
-        ];
-
-        let canastasEntregadasHoy = 2;
-        let canastasPendientes = 3;
-        let entregaActual = null;
-        let entregasRealizadas = []; // Array para guardar entregas con fotos reales
-
-        // Cambiar tabs
-        function cambiarTab(tab) {
-            // Quitar active de todos los tabs y contenidos
-            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            
-            // Activar tab seleccionado
-            document.querySelector(`[onclick="cambiarTab('${tab}')"]`).classList.add('active');
-            document.getElementById(`tab-${tab}`).classList.add('active');
-        }
-
-        // Abrir formulario de entrega
-        function abrirFormularioEntrega(canastId, monto) {
-            entregaActual = { id: canastId, monto: monto };
-            document.getElementById('canasta-info').textContent = `Canasta ${canastId} • $${monto}`;
-            document.getElementById('entrega-form').classList.add('show');
-            document.body.style.overflow = 'hidden';
-        }
-
-        // Cerrar formulario de entrega
-        function cerrarFormularioEntrega() {
-            document.getElementById('entrega-form').classList.remove('show');
-            document.body.style.overflow = 'auto';
-            limpiarFormulario();
-        }
-
-        // Limpiar formulario
-        function limpiarFormulario() {
-            document.getElementById('nombre-persona').value = '';
-            document.getElementById('dni-persona').value = '';
-            document.getElementById('telefono-persona').value = '';
-            document.querySelectorAll('.photo-upload').forEach(upload => {
-                upload.classList.remove('has-photo');
-                upload.querySelector('.photo-preview').src = '';
-            });
-            document.getElementById('btn-confirmar').disabled = true;
-        }
-
-        // Manejar método de identificación
-        document.querySelectorAll('input[name="metodo"]').forEach(radio => {
-            radio.addEventListener('change', function() {
-                document.getElementById('dni-group').style.display = this.value === 'dni' ? 'block' : 'none';
-                document.getElementById('telefono-group').style.display = this.value === 'telefono' ? 'block' : 'none';
-                validarFormulario();
-            });
-        });
-
-        // Seleccionar foto
-        function seleccionarFoto(tipo) {
-            document.getElementById(`input-${tipo}`).click();
-        }
-
-        // Manejar archivos seleccionados
-        document.getElementById('input-ticket').addEventListener('change', function(e) {
-            manejarArchivoSeleccionado(e, 'ticket');
-        });
-
-        document.getElementById('input-productos').addEventListener('change', function(e) {
-            manejarArchivoSeleccionado(e, 'productos');
-        });
-
-        document.getElementById('input-persona').addEventListener('change', function(e) {
-            manejarArchivoSeleccionado(e, 'persona');
-        });
-
-        function manejarArchivoSeleccionado(event, tipo) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const preview = document.getElementById(`preview-${tipo}`);
-                    const upload = preview.closest('.photo-upload');
-                    
-                    preview.src = e.target.result;
-                    upload.classList.add('has-photo');
-                    
-                    validarFormulario();
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        // Validar formulario
-        function validarFormulario() {
-            const nombre = document.getElementById('nombre-persona').value.trim();
-            const ticketFoto = document.getElementById('preview-ticket').src;
-            const productosFoto = document.getElementById('preview-productos').src;
-            
-            const formularioValido = nombre && ticketFoto && productosFoto;
-            document.getElementById('btn-confirmar').disabled = !formularioValido;
-        }
-
-        // Event listeners para validación
-        document.getElementById('nombre-persona').addEventListener('input', validarFormulario);
-        document.getElementById('dni-persona').addEventListener('input', validarFormulario);
-        document.getElementById('telefono-persona').addEventListener('input', validarFormulario);
-
-        // Confirmar entrega
-        function confirmarEntrega() {
-            // Mostrar loading
-            document.querySelector('.form-body').style.display = 'none';
-            document.getElementById('form-loading').classList.add('show');
-
-            // Simular validación automática
-            setTimeout(() => {
-                procesarEntrega();
-            }, 3000);
-        }
-
-        function procesarEntrega() {
-            // Obtener datos del formulario
-            const nombre = document.getElementById('nombre-persona').value;
-            const metodo = document.querySelector('input[name="metodo"]:checked').value;
-            let identificador = '';
-            
-            if (metodo === 'dni') {
-                identificador = document.getElementById('dni-persona').value;
-            } else if (metodo === 'telefono') {
-                identificador = document.getElementById('telefono-persona').value;
-            }
-
-            // Crear registro de entrega con fotos reales
-            const entrega = {
-                id: entregaActual.id,
-                monto: entregaActual.monto,
-                persona: nombre,
-                metodo: metodo,
-                identificador: identificador,
-                fotos: {
-                    ticket: document.getElementById('preview-ticket').src,
-                    productos: document.getElementById('preview-productos').src,
-                    persona: document.getElementById('preview-persona').src || null
-                },
-                fecha: new Date(),
-                validado: true
-            };
-
-            // Guardar en array de entregas realizadas
-            entregasRealizadas.unshift(entrega); // Agregar al inicio del array
-            
-            console.log('📤 Entrega procesada:', entrega);
-            
-            // Actualizar listas
-            actualizarListas();
-            
-            // Mostrar notificación de éxito
-            mostrarNotificacion('✅ Entrega registrada y validada exitosamente');
-            
-            // Cerrar formulario
-            setTimeout(() => {
-                cerrarFormularioEntrega();
-                document.querySelector('.form-body').style.display = 'block';
-                document.getElementById('form-loading').classList.remove('show');
-            }, 1000);
-
-            // Actualizar tablet en tiempo real (simular)
-            actualizarTabletTiempoReal();
-        }
-
-        function actualizarListas() {
-            // Remover canasta de pendientes
-            canastas = canastas.filter(c => c.id !== entregaActual.id);
-            canastasEntregadasHoy++;
-            canastasPendientes = canastas.length;
-
-            // Actualizar displays
-            document.getElementById('canastas-pendientes').textContent = canastas.length;
-            document.getElementById('canastas-entregadas-hoy').textContent = canastasEntregadasHoy;
-
-            // Recrear lista de canastas pendientes
-            actualizarListaCanastas();
-            
-            // Agregar al historial
-            agregarAlHistorial();
-        }
-
-        function actualizarListaCanastas() {
-            const lista = document.getElementById('lista-canastas');
-            
-            if (canastas.length === 0) {
-                lista.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">🎉</div>
-                        <div>¡Todas las canastas fueron entregadas!</div>
-                        <div style="font-size: 14px; margin-top: 5px;">Esperando nuevas donaciones...</div>
-                    </div>
-                `;
-            } else {
-                lista.innerHTML = canastas.map(canasta => `
-                    <div class="canasta-card">
-                        <div class="canasta-header">
-                            <div class="canasta-id">#${canasta.id}</div>
-                            <div class="canasta-time">${canasta.tiempo}</div>
-                        </div>
-                        <div class="canasta-content">
-                            <div class="canasta-monto">${canasta.monto} a entregar</div>
-                            <div class="canasta-productos">${canasta.productos}</div>
-                            <button class="entregar-btn" onclick="abrirFormularioEntrega('${canasta.id}', ${canasta.monto})">
-                                📦 Registrar Entrega
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
-            }
-        }
-
-        function agregarAlHistorial() {
-            const historial = document.getElementById('historial-entregas');
-            const nombre = document.getElementById('nombre-persona').value;
-            
-            const nuevoItem = document.createElement('div');
-            nuevoItem.className = 'historial-item';
-            nuevoItem.innerHTML = `
-                <div class="historial-header">
-                    <div class="historial-monto">${entregaActual.monto}</div>
-                    <div class="historial-fecha">Ahora</div>
-                </div>
-                <div class="historial-persona">Entregado a: ${nombre}</div>
-                <div class="historial-fotos">
-                    <div class="foto-mini uploaded" onclick="verFotoHistorial('ticket', '${entregaActual.id}')">📄</div>
-                    <div class="foto-mini uploaded" onclick="verFotoHistorial('productos', '${entregaActual.id}')">📸</div>
-                    <div class="foto-mini uploaded" onclick="verFotoHistorial('persona', '${entregaActual.id}')">👤</div>
-                </div>
-            `;
-            
-            historial.insertBefore(nuevoItem, historial.firstChild);
-        }
-
-        function mostrarNotificacion(mensaje) {
-            const notificacion = document.createElement('div');
-            notificacion.className = 'notification';
-            notificacion.textContent = mensaje;
-            
-            document.body.appendChild(notificacion);
-            
-            setTimeout(() => {
-                notificacion.classList.add('show');
-            }, 100);
-            
-            setTimeout(() => {
-                notificacion.classList.remove('show');
-                setTimeout(() => {
-                    document.body.removeChild(notificacion);
-                }, 300);
-            }, 3000);
-        }
-
-        function actualizarTabletTiempoReal() {
-            // Simular comunicación con la tablet
-            console.log('📡 Enviando actualización a tablet: -1 canasta disponible');
-            
-            // En la implementación real, esto sería:
-            // - WebSocket a la tablet
-            // - Actualización de base de datos
-            // - Notificación push al donante
-            
-            // Simular mensaje a ventana de tablet si está abierta
-            if (window.opener) {
-                window.opener.postMessage({
-                    tipo: 'entrega_realizada',
-                    canastas: -1,
-                    monto: entregaActual.monto
-                }, '*');
-            }
-        }
-
-        function actualizarCanasta() {
-            const nuevoContenido = document.getElementById('contenido-canasta').value;
-            
-            // Simular actualización
-            mostrarNotificacion('💾 Configuración de canasta actualizada');
-            
-            // En la implementación real:
-            // - Enviar a servidor para validación manual
-            // - Actualizar en todas las interfaces
-            console.log('📝 Nueva configuración de canasta:', nuevoContenido);
-        }
-
-        // Simular llegada de nuevas canastas
-        function simularNuevaCanasta() {
-            const nuevaCanasta = {
-                id: `DTC-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
-                monto: 720,
-                tiempo: 'Ahora',
-                productos: 'Pan lactal + 6 facturas + 4 medialunas + 2 prepizzas'
-            };
-            
-            canastas.push(nuevaCanasta);
-            document.getElementById('canastas-pendientes').textContent = canastas.length;
-            actualizarListaCanastas();
-            
-            mostrarNotificacion(`🎉 Nueva canasta disponible: #${nuevaCanasta.id}`);
-        }
-
-        // Función para ver fotos del historial
-        function verFotoHistorial(tipo, entregaId) {
-            // Simular carga de foto desde servidor
-            const fotoUrl = generarFotoEjemplo(tipo);
-            
-            // Crear modal para mostrar foto
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.style.display = 'flex';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <h3>Foto ${tipo} - Entrega ${entregaId}</h3>
-                    <img src="${fotoUrl}" alt="${tipo}" style="max-width: 100%; max-height: 400px; border-radius: 8px;">
-                    <br><br>
-                    <button onclick="this.closest('.modal').remove()" class="btn-cancel">Cerrar</button>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            
-            // Cerrar al hacer click fuera
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) {
-                    modal.remove();
-                }
-            });
-        }
-
-        function generarFotoEjemplo(tipo) {
-            // Generar SVG de ejemplo según el tipo
-            const ejemplos = {
-                ticket: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjlmYWZiIiBzdHJva2U9IiNlNWU3ZWIiLz48dGV4dCB4PSI1MCUiIHk9IjIwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiMzNzQxNTEiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkNPTVBST0JBTlRFPC90ZXh0Pjx0ZXh0IHg9IjEwIiB5PSI1MCIgZm9udC1mYW1pbHk9Im1vbm9zcGFjZSIgZm9udC1zaXplPSIxMCIgZmlsbD0iIzM3NDE1MSI+UGFuYWRlcsOtYSBTYW4gSnVhbjwvdGV4dD48dGV4dCB4PSIxMCIgeT0iNzAiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiMzNzQxNTEiPi0tLS0tLS0tLS0tLS0tLS0tLTwvdGV4dD48dGV4dCB4PSIxMCIgeT0iOTAiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiMzNzQxNTEiPlBhbiBsYWN0YWwgJDE1MDwvdGV4dD48dGV4dCB4PSIxMCIgeT0iMTEwIiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjEwIiBmaWxsPSIjMzc0MTUxIj5GYWN0dXJhcyAoNikgJDMwMDwvdGV4dD48dGV4dCB4PSIxMCIgeT0iMTMwIiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjEwIiBmaWxsPSIjMzc0MTUxIj5NZWRpYWx1bmFzICg0KSAkMjAwPC90ZXh0Pjx0ZXh0IHg9IjEwIiB5PSIxNTAiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiMzNzQxNTEiPlByZXBpenphcyAoMikgJDcwPC90ZXh0Pjx0ZXh0IHg9IjEwIiB5PSIxODAiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiMzNzQxNTEiPi0tLS0tLS0tLS0tLS0tLS0tLTwvdGV4dD48dGV4dCB4PSIxMCIgeT0iMjAwIiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMTZhMzRhIiBmb250LXdlaWdodD0iYm9sZCI+VE9UQUw6ICQ3MjA8L3RleHQ+PC9zdmc+',
-                productos: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmOWZmIi8+PHRleHQgeD0iNTAlIiB5PSI0MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI0MCIgZmlsbD0iIzE2YTM0YSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+🍞🥐</L3RleHQ+PHRleHQgeD0iNTAlIiB5PSI3MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzM3NDE1MSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+UHJvZHVjdG9zIEVudHJlZ2Fkb3M8L3RleHQ+PC9zdmc+',
-                persona: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWZmNmZmIi8+PHRleHQgeD0iNTAlIiB5PSI0MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI0MCIgZmlsbD0iIzI1NjNlYiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+👤</L3RleHQ+PHRleHQgeD0iNTAlIiB5PSI3MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzM3NDE1MSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Foto de Entrega</L3RleHQ+PC9zdmc+'
-            };
-            
-            return ejemplos[tipo] || ejemplos.productos;
-        }
-
-        // Simular nuevas canastas cada 30 segundos para demo
-        setInterval(() => {
-            if (Math.random() < 0.3 && canastas.length < 5) {
-                simularNuevaCanasta();
-            }
-        }, 30000);
-
-        // Función para verificar entregas duplicadas (validación)
-        function verificarEntregaDuplicada(nombre, metodo, identificador) {
-            // En la implementación real, esto verificaría en la base de datos
-            // si la persona ya retiró una canasta hoy en este comercio
-            
-            const hoy = new Date().toDateString();
-            // Simular verificación...
-            return false; // No duplicado para el demo
-        }
-
-        // Función para validación automática con IA (futuro)
-        function validarFotosConIA(fotos) {
-            // Esta función implementaría validación con IA:
-            // - Verificar que la foto del ticket es real
-            // - Verificar que los productos coinciden
-            // - Detectar si la foto de la persona es apropiada
-            
-            console.log('🤖 Validando fotos con IA...');
-            
-            // Por ahora, siempre retorna true (validación automática)
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    resolve({
-                        valido: true,
-                        confianza: 0.95,
-                        observaciones: 'Ticket y productos válidos detectados'
-                    });
-                }, 2000);
-            });
-        }
-
-        // Inicialización
-        document.addEventListener('DOMContentLoaded', function() {
-            // Cargar datos del comercio desde URL o localStorage
-            const urlParams = new URLSearchParams(window.location.search);
-            const comercioId = urlParams.get('comercio') || 'panaderia-san-juan-001';
-            
-            console.log(`🏪 Panel cargado para comercio: ${comercioId}`);
-            
-            // En la implementación real:
-            // - Cargar datos del comercio desde API
-            // - Configurar WebSocket para actualizaciones en tiempo real
-            // - Verificar autenticación del comercio
-        });
-
-        // Función para cerrar modal al hacer click fuera
-        document.getElementById('entrega-form').addEventListener('click', function(e) {
-            if (e.target === this) {
-                cerrarFormularioEntrega();
-            }
-        });
-
-        // Prevenir scroll del body cuando el modal está abierto
-        document.addEventListener('touchmove', function(e) {
-            if (document.getElementById('entrega-form').classList.contains('show')) {
-                if (!e.target.closest('.form-container')) {
-                    e.preventDefault();
-                }
-            }
-        }, { passive: false });
-    </script>
-</body>
-</html>
+                        <div class="upload-text">Tocá para tomar foto del ticket<br><small>(En móvil se abre la cámara)</small></div>
